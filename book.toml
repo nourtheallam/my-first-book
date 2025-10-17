@@ -1,6 +1,8 @@
 [book]
-authors = ["nallam"]
+authors = ["nourtheallam"]
 language = "en"
-multilingual = false
 src = "src"
-title = "Hello World"
+title = "course-notes"
+[output.html]
+mathjax-support = true
+theme = "theme"

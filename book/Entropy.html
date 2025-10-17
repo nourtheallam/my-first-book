@@ -1,0 +1,395 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Entropy - course-notes</title>
+
+
+        <!-- Custom HTML head -->
+        <script>
+          // MathJax config must be defined before the MathJax script is loaded
+          window.MathJax = {
+            tex: {
+              inlineMath: [['$', '$'], ['\\(', '\\)']],
+              displayMath: [['$$', '$$'], ['\\[', '\\]']],
+              processEscapes: true
+            },
+            options: {
+              skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] // ignore code blocks
+            }
+          };
+        </script>
+        
+        <!-- Load MathJax v3 -->
+        <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">course-notes</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="entropy"><a class="header" href="#entropy">Entropy</a></h1>
+<h1 id="1-entropy"><a class="header" href="#1-entropy">1. Entropy</a></h1>
+<h2 id="1-definition"><a class="header" href="#1-definition">1. Definition</a></h2>
+<p>Given a set of objects $S = { k_{1}, \dots, k_{n} }$, a probability distribution for each object $D = { p_{1}, \dots , p_{n} }$, the <strong>entropy</strong> $H(D)$ of $D$ is $$-\sum_{i=1}^np_{i} \cdot \log(p_{i}) = \sum_{i=1}^n p_{i} \cdot \log\left( \frac{1}{p_{i}} \right)$$</p>
+<h2 id="2-shannons-theorem"><a class="header" href="#2-shannons-theorem">2. Shannon's Theorem</a></h2>
+<p>Given a sender and a receiver, in which the sender want to send a sequence $S_{1}, \dots , S_{m}$ where each $S_{j}$ is chosen randomly and independently according to $D$, meaning that $S_{j} = k_{i}$ with probability $p_{i}$, <strong>Shannon's theorem</strong> states that for any protocol that the sender and the receiver might use, the expected number of bits required to transmit $S_{1}, \dots S_{m}$ using that protocol, which is at least $$m \cdot H(D)$$</p>
+<h2 id="3-examples"><a class="header" href="#3-examples">3. Examples</a></h2>
+<p>If we have a uniform distribution $p_{i} = \frac{1}{n}$, then $$H(D) = \sum_{i=1}^n \left( \frac{1}{n} \right) \log (n) = \log (n) \quad \text{(worst case)}$$If we have a geometric distribution $p_{i} = \frac{1}{2^i}$ for all $1 \leq i &lt; n$, then
+$$H(D) = \sum_{i=1}^{n-1} \frac{i}{2^i} + \frac{n-1}{2^{n-1}}$$
+This is an <strong>arithmetico-geomtric</strong> series.</p>
+<h1 id="2-entropy-and-data-structure-lower-bounds"><a class="header" href="#2-entropy-and-data-structure-lower-bounds">2. Entropy and data structure lower bounds</a></h1>
+<h2 id="1-theorem-1"><a class="header" href="#1-theorem-1">1. Theorem 1</a></h2>
+<p>For any comparison-based data structure storing $k_{1}, \dots , k_{n}$, each associated with probabilities $p_{1}, .., p_{n}$, the expected number of comparisons while searching for an item is $\Omega(H(D))$.</p>
+<p><strong>Proof</strong></p>
+<p>Assume that the sender and receiver both store the elements $k_{1}, \dots , k_{n}$ in some comparison-based data structure that is agreed on beforehand.</p>
+<p>When the sender wants to transmit $S_{1}$, they perform the search for $S_{1}$ in the data structure. This results in a sequence of comparisons and the results of the comparisons form a sequence of $1$s (true) and $0$s (false) which the sender sends to the receiver.</p>
+<p>On the receiving end, the receiver runs a search algorithm without knowing the value of $S_{1}$. This can be done since the receiver is doing exactly the same comparisons and knows the results of the comparisons. This way, the sender can transmit a sequence to the receiver.</p>
+<p>Now, consider the number of bits needed to transmit this sequence and the number of comparisons needed to handle the request sequence, these numbers are the same.</p>
+<h2 id="2-static-optimal-bst"><a class="header" href="#2-static-optimal-bst">2. Static optimal BST</a></h2>
+<p>Assume that all the elements in the request sequence are in the tree, that $p_{i}$ is the probability of access of the element $A_{i}$, and that the entropy $H = \sum_{i=1}^n p_{i} \cdot \log\left( \frac{1}{p_{i}} \right)$.</p>
+<p>The expected cost (number of comparisons), $C$, of the static optimal BST is $\geq H$.</p>
+<h2 id="3-not-all-requested-elements-are-in-the-tree"><a class="header" href="#3-not-all-requested-elements-are-in-the-tree">3. Not all requested elements are in the tree</a></h2>
+<p>Let $p_{i}$ be the probability of access of element $A_{i}$ and $q_{i}$ be the probability of requesting an element between $A_{i}$ and $A_{i+1}$. The entropy is defined as $$H = \sum_{i=1}^n p_{i} \cdot \log\left( \frac{1}{p_{i}} \right) + \sum_{i=0}^n q_{i} \cdot \log\left( \frac{1}{q_{i}} \right)$$
+Note that $C \geq H$ still applies.</p>
+<p><img src="Attachments/Pasted%20image%2020250313141919.png" alt="Pasted image 20250313141919.png" /></p>
+<h1 id="3-nearly-optimal-search-trees"><a class="header" href="#3-nearly-optimal-search-trees">3. Nearly-Optimal Search Trees</a></h1>
+<h2 id="1-p_i-h"><a class="header" href="#1-p_i-h">1. $p_{i}, H$</a></h2>
+<p>Our goal is to achieve $O(H+1)$ query time.
+#final what is the point of the $+1$?
+Edge case of 1/log(n), etc.</p>
+<h2 id="2-idea-probability-splitting"><a class="header" href="#2-idea-probability-splitting">2. Idea: Probability Splitting</a></h2>
+<p>First, we find a key $k_{i}$ such that
+$$\sum_{j=1}^{i-1}p_{j} \leq \frac{1}{2} \sum_{j=1}^n p_{j}$$And
+$$\sum_{j=i+1}^np_{j} \leq \frac{1}{2} \sum_{j=1}^n p_{j}$$</p>
+<p>Let the key $k_{i}$ become the root of a binary search tree, then recurse.</p>
+<p>So, the left subtree is constructed recursively from $(k_{1}, \dots k_{i-1})$ with probabilities $(p_{1}, \dots , p_{i-1})$ and the right subtree is constructed recursively from $(k_{i+1}, \dots k_{n})$ with probabilities $(p_{i+1}, \dots , p_{n})$.</p>
+<p>Let $T$ be the resulting tree.</p>
+<p><strong>Observation:</strong> In $T$, if node $k_{i}$ has depth $\text{depth}<em>T(k</em>{i})$, then
+$$\sum_{k_{j}\in T(k_{i})}p_{j} \leq \frac{1}{2^{\text{depth}<em>T(k</em>{i})}}$$
+Where $T(k_{i})$ is the set of nodes in the subtree rooted at $k_{i}$.</p>
+<p><strong>Theorem:</strong> $T$ can answer queries in $O(H + 1)$ expected time
+<strong>Proof:</strong> As $$p_{i} \leq \sum_{k_{j} \in T(k_{i})} p_{j} \leq \frac{1}{2^{\text{depth}<em>T(k</em>{i})}},$$
+It must be true that
+$$\text{depth}<em>T(k</em>{i}) \leq \log\left( \frac{1}{p_{i}} \right).$$
+Thus, the expected depth of a chosen key is
+$$\sum_{i=1}^n p_{i} \cdot \text{depth}<em>T(k</em>{i}) \leq \sum_{i=1}^n p_{i} \cdot \log\left( \frac{1}{p_i} \right) = H,$$
+yielding a running time of $O(H+1)$.</p>
+<p><strong>Construction</strong></p>
+<ol>
+<li>Finding $k_{i}$</li>
+</ol>
+<p>This takes linear, $\Theta(n)$, time.</p>
+<ol start="2">
+<li>$n$ keys</li>
+</ol>
+<p>$\Theta(n^2)$?</p>
+<p><strong>Better algorithm</strong></p>
+<ol>
+<li>Finding $k_{i}$</li>
+</ol>
+<p>Use binary search instead, $\Theta(n \log n)$</p>
+<p><strong><em>Best</em> Algorithm</strong>*</p>
+<ol>
+<li>Finding $k_{i}$</li>
+</ol>
+<p>Use doubling (exponential) search.</p>
+<ul>
+<li>Check $k_{1}, k_{2}, k_{4}, k_{8}, \dots$ until we find the first $k_{2}^j$ with $2^j \geq i$</li>
+<li>Binary search in $k_{2}^{j-1}, \dots, k_{2}^j$</li>
+</ul>
+<p>This gives us a running time of $\Theta(\log n)$. In fact, it is $\Theta(\log i)$ because $2^j \leq 2i$.</p>
+<p>Idea: search simultaneously starting at $k_{1}$ and working forward, and starting at $k_{n}$ and working backward.</p>
+<p>Then, $k_{i}$ can be found in $O{(\log(\min(i, n-i +1)))}$.</p>
+<p>And the total running time becomes $$T(n) = O(\log(\min (i, n-i +1))) + T(i-1) + T(n-i)$$Which we can prove, by induction that the running time is $O(n)$.</p>
+<h1 id="4-mtf-compression"><a class="header" href="#4-mtf-compression">4. MTF Compression</a></h1>
+<h2 id="1-elias-gamma-coding"><a class="header" href="#1-elias-gamma-coding">1. Elias gamma coding</a></h2>
+<p>Used to code positive, and sometimes, negative integers whose maximum value is not known. There are $i \geq 0$ steps of encoding.</p>
+<ol>
+<li>
+<p>Write down the binary expression of $i$, which uses $\log \lfloor i \rfloor + 1$ bits</p>
+</li>
+<li>
+<p>Prepend it by $\lfloor \log i \rfloor$ $0$'s</p>
+<p>Example: $9 \rightarrow 0001001$</p>
+</li>
+</ol>
+<h2 id="2-a-coding-scheme-that-uses-fewer-bits"><a class="header" href="#2-a-coding-scheme-that-uses-fewer-bits">2. A coding scheme that uses fewer bits:</a></h2>
+<ul>
+<li>
+<p>Gamma code: the leading $0$s encode $\lfloor \log i \rfloor \leq \log i$</p>
+</li>
+<li>
+<p>This number can be encoded using $2\lfloor \log \log i \rfloor + 1$ bits using Elias gamma coding</p>
+<p>Example: $9 \rightarrow 0111001$</p>
+</li>
+</ul>
+<p>So, the number of bits used is $\log i + O(\log \log i)$.</p>
+<h2 id="3-mtf-compression"><a class="header" href="#3-mtf-compression">3. MTF Compression</a></h2>
+<p>Encode $m$ integers from $1$ to $m$.</p>
+<ul>
+<li>
+<p>The sender and receiver each maintain identical lists of $1, 2, \dots, n$</p>
+</li>
+<li>
+<p>To send the symbol $j$ we do not encode $j$ directly. Instead, the sender looks for $j$ in their list and finds it at position $i$.</p>
+</li>
+<li>
+<p>Sender encodes $i$ in $\log i + O(\log \log i)$ bits and sends them to the receiver</p>
+</li>
+<li>
+<p>The receiver decodes $i$, and looks at the $i$th element in the list to find $j$</p>
+</li>
+<li>
+<p>Both move $j$ to the front and continue</p>
+<p>Example: Given the range $1, 2$
+2211112
+21211122</p>
+</li>
+</ul>
+<p><strong>Jensen's inequality:</strong> Let $f: R \rightarrow R$ be a strictly increasing concave function. Then, $\sum_{i=1}^n f(t_{i})$ subject to $\sum_{i=1}^nt_{i} \leq m$ is maximized when $t_{1} = t_{2} = \dots = t_{n} = \frac{m}{n}$.</p>
+<p><strong>Claim:</strong> We can use this to prove that $\text{MTF}$ compresses $S_{1}, \dots S_{m}$ into $$n \log n + m\cdot H + O(n \log \log n + m \log H)$$ bits.</p>
+<p><strong>Proof:</strong> If the number of distinct symbols between two consecutive occurrences of $j$ is $t-1$, then the cost of encoding the second $j$ is $\log(t) + O(\log \log t)$. Therefore, the total cost of encoding all the occurrences of $j$ is</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+#final Where does the $n + O(n \log n)$ term come from? And how do the $t$s stay constant if we are employing MTF?
+$$\begin{gathered} C_{j} \leq \log n + O(\log \log n) + \sum_{i=1}^{m_{j}}(\log t_{i} + O(\log \log t_{i})) \ &amp; \left( \sum_{j=1}t_{j} \leq m \right)\ \leq \log n + O(\log \log n) + m_{j}\left( \log\left( \frac{m}{m_{j}} \right) + O\left( \log \log \frac{m}{m_{j}} \right) \right) \end{gathered}$$
+Where $t_{i} - 1$ is the number of symbols between the $i-1$ and $i$ occurrence of $j$.</li>
+</ul>
+<p>Summing over all $j$, the total number of bits used is</p>
+<p>$$\begin{aligned} &amp;\sum_{j=1}^n C_{j}\ &amp;\leq n \log n + O(n \log \log n) + m \cdot H + \sum_{j=1}^m O\left( m_{j} \log \log \frac{m}{m_{j}} \right) \ &amp; \leq n \log n + m \cdot H + O(n \log \log n + m \log H) \end{aligned}$$</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="Amortized Analysis.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="Resizable Arrays.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="Amortized Analysis.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="Resizable Arrays.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

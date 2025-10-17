@@ -15,6 +15,23 @@
         <meta charset="UTF-8">
         <meta name="robots" content="noindex">
         <!-- Custom HTML head -->
+        <script>
+          // MathJax config must be defined before the MathJax script is loaded
+          window.MathJax = {
+            tex: {
+              inlineMath: [['$', '$'], ['\\(', '\\)']],
+              displayMath: [['$$', '$$'], ['\\[', '\\]']],
+              processEscapes: true
+            },
+            options: {
+              skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] // ignore code blocks
+            }
+          };
+        </script>
+        
+        <!-- Load MathJax v3 -->
+        <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
         <link rel="stylesheet" href="css/variables.css">
@@ -27,6 +44,6 @@
         <!-- Custom theme stylesheets -->
     </head>
     <body class="sidebar-iframe-inner">
-        <ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html" target="_parent"><strong aria-hidden="true">1.</strong> Chapter 1</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter_1_1.html" target="_parent"><strong aria-hidden="true">1.1.</strong> Chapter 1.1</a></li></ol></li></ol>
+        <ol class="chapter"><li class="chapter-item expanded "><a href="Amortized Analysis.html" target="_parent"><strong aria-hidden="true">1.</strong> Amortized Analysis</a></li><li class="chapter-item expanded "><a href="Entropy.html" target="_parent"><strong aria-hidden="true">2.</strong> Entropy</a></li><li class="chapter-item expanded "><a href="Resizable Arrays.html" target="_parent"><strong aria-hidden="true">3.</strong> Resizable Arrays</a></li><li class="chapter-item expanded "><a href="Self-Adjusting Binary Trees.html" target="_parent"><strong aria-hidden="true">4.</strong> Self-Adjusting Binary Trees</a></li><li class="chapter-item expanded "><a href="Self-Adjusting Lists.html" target="_parent"><strong aria-hidden="true">5.</strong> Self-Adjusting Lists</a></li><li class="chapter-item expanded "><a href="Succinct Data Structures.html" target="_parent"><strong aria-hidden="true">6.</strong> Succinct Data Structures</a></li><li class="chapter-item expanded "><a href="Text Indexing Structures.html" target="_parent"><strong aria-hidden="true">7.</strong> Text Indexing Structures</a></li><li class="chapter-item expanded "><a href="Van Emde Boas Trees.html" target="_parent"><strong aria-hidden="true">8.</strong> Van Emde Boas Trees</a></li></ol>
     </body>
 </html>

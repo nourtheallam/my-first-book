@@ -3,10 +3,28 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Chapter 1 - my-first-book</title>
+        <title>course-notes</title>
+        <meta name="robots" content="noindex">
 
 
         <!-- Custom HTML head -->
+        <script>
+          // MathJax config must be defined before the MathJax script is loaded
+          window.MathJax = {
+            tex: {
+              inlineMath: [['$', '$'], ['\\(', '\\)']],
+              displayMath: [['$$', '$$'], ['\\[', '\\]']],
+              processEscapes: true
+            },
+            options: {
+              skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] // ignore code blocks
+            }
+          };
+        </script>
+        
+        <!-- Load MathJax v3 -->
+        <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
 
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,28 +42,43 @@
         <link rel="stylesheet" href="fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" href="highlight.css">
-        <link rel="stylesheet" href="tomorrow-night.css">
-        <link rel="stylesheet" href="ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
-        <!-- Provide site root to javascript -->
+        <!-- Provide site root and default themes to javascript -->
         <script>
-            var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc.js"></script>
     </head>
     <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
     <div id="body-container">
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
         <script>
             try {
-                var theme = localStorage.getItem('mdbook-theme');
-                var sidebar = localStorage.getItem('mdbook-sidebar');
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
 
                 if (theme.startsWith('"') && theme.endsWith('"')) {
                     localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
@@ -59,7 +92,8 @@
 
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script>
-            var theme;
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             const html = document.documentElement;
@@ -72,17 +106,20 @@
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
-            var sidebar = null;
-            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
             } else {
                 sidebar = 'hidden';
+                sidebar_toggle.checked = false;
             }
-            sidebar_toggle.checked = sidebar === 'visible';
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
@@ -109,18 +146,19 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
-                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
                             <i class="fa fa-search"></i>
                         </button>
                     </div>
 
-                    <h1 class="menu-title"></h1>
+                    <h1 class="menu-title">course-notes</h1>
 
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -132,7 +170,12 @@
 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -152,16 +195,1111 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="chapter-1"><a class="header" href="#chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></a></h1>
+                        <h1 id="amortized-analysis"><a class="header" href="#amortized-analysis">Amortized Analysis</a></h1>
+<h4 id="1-what-is-it"><a class="header" href="#1-what-is-it">1. What is it?</a></h4>
+<p><strong>Amortized:</strong> paid-off over time.</p>
+<p>The time required to perform a sequence of data structures operations is averaged over all operations performed.</p>
+<p>This guarantees the <strong>average</strong> performance of each operation in the <strong>worst case</strong> (meaning, we take the worst case performance of each operation and average the total).</p>
+<p>This is ==not the same== as <strong>average case</strong> analysis which relies on some probability distribution of the input while amortized always considers the worst case.</p>
+<h4 id="2-why-amortized-analysis"><a class="header" href="#2-why-amortized-analysis">2. Why amortized analysis?</a></h4>
+<ul>
+<li>Can be used to show that the average cost of an operation is small, even though a single operation can be costly.</li>
+<li>Extra flexibility of amortized bounds can lead to more practical data structures.
+e.g. <strong>balanced binary search tree</strong> (usually, we need to rebalance the tree after insertion/deletion operations) vs. <strong>splay tree</strong>.</li>
+</ul>
+<h4 id="3-aggregate-analysis"><a class="header" href="#3-aggregate-analysis">3. Aggregate analysis</a></h4>
+<h5 id="steps"><a class="header" href="#steps">Steps</a></h5>
+<ol>
+<li>Show that for all $n$, a sequence of $n$ operations uses $T(n)$ worst-case time.</li>
+<li>The amortized cost per operation is $\frac{T(n)}{n}$.</li>
+</ol>
+<p>Each operation has the same amortized cost.</p>
+<h5 id="example-stack-with-multi-pop"><a class="header" href="#example-stack-with-multi-pop">Example: Stack with multi-pop</a></h5>
+<p><strong>Problem:</strong> $MULTIPOP(S, k)$ given the stack $S$, remove its $k$ top objects.</p>
+<p><strong>Pseudocode:</strong></p>
+<p>While $k \neq 0$ and not $STACK-EMPTY(S)$
+do $POP(S)$
+$k \leftarrow k-1$</p>
+<p><strong>Worst-case analysis:</strong>
+PUSH, POP: $O(1)$
+MULTIPOP: $O(\min(k,s))$ given that the stack initially contains $s$ elements.</p>
+<p><strong>Aggregate Analysis</strong></p>
+<p>Analysis of a sequence of $n$ PUSH, POP, and MULTIPOP operations on an <strong>initially empty</strong> stack.</p>
+<p>MULTIPOP: $O(n) \rightarrow$ the worst case of any operation is $O(n) \rightarrow$ the total cost of $n$ operations is $O(n^2)$. ==This is not tight!==</p>
+<p><strong>Proper analysis:</strong>
+Observation: each object can be popped at most once for each time it is pushed.</p>
+<p>The number of times POP can be called on an initially-empty stack, including calls within MULTIPOP, is at most the number of PUSH operations $\rightarrow$ which is $O(n)$.</p>
+<p>The total cost of $n$ PUSH, POP, MULTIPOP operations on an initially empty stack is $O(n)$.</p>
+<p><strong>Amortized cost per operation:</strong> $\frac{O(n)}{n} = O(1)$.</p>
+<h5 id="example-incrementing-a-binary-counter"><a class="header" href="#example-incrementing-a-binary-counter">Example: Incrementing a Binary Counter</a></h5>
+<p><strong>Problem:</strong> A $k$-bit binary counter that counts upward from $0$. Stored in an array $A[0 \dots k-1]$.</p>
+<p><strong>Example:</strong> Let $k=5$, array $=01011$. Incrementing this turns it into $01100$.</p>
+<p><strong>Procedure:</strong></p>
+<p>==Shows us that the running time is proportional to the number of bit flips.==</p>
+<p>INCREMENT($A[0 \dots k-1]$)
+i $\rightarrow$ 0
+While $i &lt; k$ and $A[i] = 1$
+do
+$A[i] \rightarrow 0$
+$i \rightarrow i+1$
+If $i &lt; k$
+then $A[i] \rightarrow 1$</p>
+<p><strong>Worst-case analysis:</strong>
+INCREMENT: $O(k)$
+$n$ INCREMENTS: $O(kn)$</p>
+<p><strong>Example:</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Value</th><th>A[4]</th><th>A[3]</th><th>A[2]</th><th>A[1]</th><th>A[0]</th></tr></thead><tbody>
+<tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+<tr><td>2</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+<tr><td>3</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>4</td><td>0</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td><strong>==Observation:==</strong> $A[0]$ flips every time INCREMENT is called, $A[1]$ flips every other time, A[2], flips every third time, etc.</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>$\rightarrow$ For $i=0, 1, \dots \lfloor \log n \rfloor$, bit $A[i]$ flips $\lfloor \frac{n}{2^i}\rfloor$ times in a sequence of $n$ INCREMENT operations on an initially $0$ counter.</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>$\rightarrow$ For $i &gt; \lfloor \log n \rfloor$, bit $A[i]$ never flips.</td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table>
+</div>
+<p>We can use the above observations to conclude that the total number of bit flips in the sequence of $n$ INCREMENT operations is $$\sum_{i=0}^{\lfloor \log n \rfloor} \left\lfloor \frac{n}{2^i} \right\rfloor &lt; \sum_{i=0}^\infty \frac{n}{2^i} = n\sum_{i=0}^\infty \frac{1}{2^i} = 2n \quad \text{(Geometric series)}$$
+<strong>Worst-case analysis:</strong> the worst-case time of a sequence of $n$ INCREMENT operations in thus $O(n)$.</p>
+<p><strong>Amortized cost per operation:</strong> $\frac{O(n)}{n} = O(1)$.</p>
+<h3 id="3-the-accounting-method"><a class="header" href="#3-the-accounting-method">3. The accounting method</a></h3>
+<p><strong>Idea:</strong> We pre-charge a cost for each operation, and we need to make sure that there is enough "credit" for each operation.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>
+<p>We charge each operation what we think its amortized time =="cost"== is.</p>
+</li>
+<li>
+<ol>
+<li>If the amortized cost exceeds the actual cost, the surplus remains as a =="credit"== associated with the data structure.</li>
+<li>If the amortized cost is less than the actual cost, the accumulated credit is used to pay for the cost overflow.</li>
+</ol>
+<p>$\rightarrow$ To show that the amortized cost is correct, we should ensure that, at all times the total credit associated with the data structure is nonnegative $\iff$ the total amortized cost $\geq$ the total actual cost.</p>
+<p>==Why is this enough:== The credit is the difference between the total amortized cost so far, and the total actual cost so far.</p>
+</li>
+</ol>
+<h5 id="example-stack-with-multipop"><a class="header" href="#example-stack-with-multipop">Example: Stack with MULTIPOP</a></h5>
+<p>Recall that
+<strong>Actual cost:</strong> PUSH is $O(1)$ ($1$ dollar), POP is $O(1)$ ($1$ dollar) and MULTIPOP is $O(\min(k, s))$ ($\min(k, s)$ dollars) where $s$ is the number of items in the stack.</p>
+<p>Suppose we assign the following <strong>amortized costs</strong>:
+PUSH $\rightarrow$ $2$ dollars
+POP $\rightarrow$ $0$ dollars
+MULTIPOP $\rightarrow$ $0$ dollars
+(resulting in $O(1)$ amortized time).</p>
+<p>We start with an empty stack, whose credit is $0$, which is fine because it is nonnegative.</p>
+<p>When we PUSH an object into the stack, we charge the operation $2$ dollars. Since this results in an excess cost of $1$, we charge $1$ dollar and use the other as credit. ==We associate this credit with the object we just pushed onto the stack.==</p>
+<p>When we POP an object from the stack, we ==thus charge the operation nothing== as we pay its cost using its $1$ dollar credit. Since each object pushed onto the stack is associate with a credit, POP will never make the credit negative.</p>
+<p>And the same analysis applies for MULTIPOP$(k,s)$. There are $\min(k,s)$ dollars of credit associated with $\min(k,s)$ objects being popped. Therefore, the total credit of the stack is nonnegative at all times.</p>
+<h5 id="example-incrementing-a-binary-counter-1"><a class="header" href="#example-incrementing-a-binary-counter-1">Example: Incrementing a binary counter</a></h5>
+<p>The running time of INCREMENT is proportional to the number of bits flipped, and the actual cost of bit flipping is $1$ dollar.</p>
+<p>Suppose we charge a bit flip of $0 \rightarrow 1$ an <strong>amortized cost</strong> of $2$ dollars and a bit flip of $1 \rightarrow 0$ a cost of $0$ dollars which we associate with the flipped bit.</p>
+<p>Therefore, when we flip $1$ to $0$, we charge $1$ dollar and give that bit $1$ dollar of credit.</p>
+<p>Since all the bits are initially $0$s, the total credit of the binary counter is initially $0$ and therefore nonnegative. Moreover, we can conclude that it is nonnegative at all times.</p>
+<p>INCREMENT changes at most one $0$ bit to $1$, so ==its amortized cost is at most== $2$, ==which results in $O(1)$!==</p>
+<h3 id="4-the-potential-method"><a class="header" href="#4-the-potential-method">4. The Potential Method</a></h3>
+<p><strong>Idea:</strong> Instead of credits, we present the prepaid work as ==potential== which can be ==released== to pay for future operations.</p>
+<p><strong>What's the difference between this and the credit system?</strong> Potential is a ==function== of the entire data structure.</p>
+<p><strong>Steps</strong></p>
+<ul>
+<li>Let $D_{i}$ be our data structure after the $i$th operation and</li>
+<li>Let $\phi(D_{i})$ be the potential of $D_{i}$ and</li>
+<li>Let $C_{i}$ be the cost of the $i$th operation</li>
+<li>The amortized cost of the $i$th operation $a_{i} = C_{i} + \phi(D_{i}) - \phi(D_{i-1})$</li>
+</ul>
+<p>$\rightarrow$ $\phi(D_{i}) - \phi(D_{i-1})$ is the change in potential</p>
+<p>A correct potential function ensures that the total amortized cost is an upper bound on the total actual cost.</p>
+<p>The total amortized cost of $n$ operations is $$\sum_{i=1}^n a_{i} = \sum_{i=1}^n(C_{i} + \phi(D_{i}) - \phi(D_{i-1})) = (\sum_{i=1}^n C_{i}) + \phi(D_{n}) - \phi(D_{0})$$
+==Our task now is to define a <strong>potential function</strong> such that==</p>
+<ol>
+<li>$\phi(D_{0}) = 0$</li>
+<li>$\phi(D_{i}) \geq 0$ for all $i$</li>
+</ol>
+<p>If we achieve, we guarantee the upper bound
+$$\sum_{i=1}^n C_{i} = \sum_{i=1}^n a_{i} - \phi(D_{n}) \leq \sum_{i=1}^n a_{i}$$
+<strong>Example: Stack with MULTIPOP</strong></p>
+<p>We define the potential function $\phi$ on an initially empty stack to be the ==number of objects== in the stack. Therefore, $\phi(D_{0}) = 0$ where $D_{0}$ is the empty stack. This definition also ensures that the potential is always nonnegative as we can never have a negative number of objects in the stack. Moreover, the total amortized cost of $n$ operations with respect to $\phi$ represents an upper bound on the actual cost.</p>
+<p>If the stack contains $s$ objects before the $i$th operation, then PUSH leads to a positive change in potential of $1$
+$$\phi(D_{i}) - \phi(D_{i-1}) = s + 1 - s = 1$$
+And $$a_{i} = C_{i} +1$$
+Similar logic applies if we do MULTIPOP with $k' = \min(k, s)$ elements, the change in potential would be $k'$ and the amortized cost of the $i$th operation is $C_{i} - k' = k'- k' = 0$.</p>
+<p><mark style="background: #FFB8EBA6;">$C_{i} = k'$ because the actual cost would be at most $k'$ elements popped by multipop. </mark></p>
+<p>And with pop, in that case the amortized cost would be $1 - 1 = 0$.</p>
+<p><strong>Example: Binary counter</strong></p>
+<p>We let $\phi(D_{i})$ be the number of set bits (the number of $1$s). We define this quantity as $b_{i}$.</p>
+<p>This potential function is correct because, initially, no bits are set and so $\phi(D_{0}) = 0$. Moreover, it can never be negative as you cannot have a negative number of set bits.</p>
+<p>The amortized cost of an INCREMENT operation will depend on the number of $1$s flipped to $0$s. Define this quantity for the $i$th increment as $t_{i}$.</p>
+<p>The actual cost of the operation is, therefore, at most $t_{i}+1$.</p>
+<p>If $b_{i}$ is $0$, then the $i$th operation sets all $k$ bits from $1$ to $0$. So, $b_{i-1} = t_{i} = k$.</p>
+<p>If $b_{i} &gt; 0$, then $b_{i}= b_{i-1} - t_{i} + 1$.</p>
+<p>So, in either case, $b_{i} \leq b_{i-1} - t_{i} +1$, and the potential difference is
+$$ \begin{aligned} &amp;= b_{i} - b_{i-1} \ &amp;\leq (b_{i} - t_{i} +1)- b_{i-1} \ &amp;= 1 - t_{i} \end{aligned} $$
+And the amortized cost is therefore
+$$ \begin{aligned} a_{i} &amp;= C_{i} + \phi(D_{i}) - \phi(D_{i-1}) \ &amp;\leq (t_{i}+1)+ (1-t_{i}) \ &amp;= 2 \ &amp;=O(1) \ \end{aligned} $$</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="entropy"><a class="header" href="#entropy">Entropy</a></h1>
+<h1 id="1-entropy"><a class="header" href="#1-entropy">1. Entropy</a></h1>
+<h2 id="1-definition"><a class="header" href="#1-definition">1. Definition</a></h2>
+<p>Given a set of objects $S = { k_{1}, \dots, k_{n} }$, a probability distribution for each object $D = { p_{1}, \dots , p_{n} }$, the <strong>entropy</strong> $H(D)$ of $D$ is $$-\sum_{i=1}^np_{i} \cdot \log(p_{i}) = \sum_{i=1}^n p_{i} \cdot \log\left( \frac{1}{p_{i}} \right)$$</p>
+<h2 id="2-shannons-theorem"><a class="header" href="#2-shannons-theorem">2. Shannon's Theorem</a></h2>
+<p>Given a sender and a receiver, in which the sender want to send a sequence $S_{1}, \dots , S_{m}$ where each $S_{j}$ is chosen randomly and independently according to $D$, meaning that $S_{j} = k_{i}$ with probability $p_{i}$, <strong>Shannon's theorem</strong> states that for any protocol that the sender and the receiver might use, the expected number of bits required to transmit $S_{1}, \dots S_{m}$ using that protocol, which is at least $$m \cdot H(D)$$</p>
+<h2 id="3-examples"><a class="header" href="#3-examples">3. Examples</a></h2>
+<p>If we have a uniform distribution $p_{i} = \frac{1}{n}$, then $$H(D) = \sum_{i=1}^n \left( \frac{1}{n} \right) \log (n) = \log (n) \quad \text{(worst case)}$$If we have a geometric distribution $p_{i} = \frac{1}{2^i}$ for all $1 \leq i &lt; n$, then
+$$H(D) = \sum_{i=1}^{n-1} \frac{i}{2^i} + \frac{n-1}{2^{n-1}}$$
+This is an <strong>arithmetico-geomtric</strong> series.</p>
+<h1 id="2-entropy-and-data-structure-lower-bounds"><a class="header" href="#2-entropy-and-data-structure-lower-bounds">2. Entropy and data structure lower bounds</a></h1>
+<h2 id="1-theorem-1"><a class="header" href="#1-theorem-1">1. Theorem 1</a></h2>
+<p>For any comparison-based data structure storing $k_{1}, \dots , k_{n}$, each associated with probabilities $p_{1}, .., p_{n}$, the expected number of comparisons while searching for an item is $\Omega(H(D))$.</p>
+<p><strong>Proof</strong></p>
+<p>Assume that the sender and receiver both store the elements $k_{1}, \dots , k_{n}$ in some comparison-based data structure that is agreed on beforehand.</p>
+<p>When the sender wants to transmit $S_{1}$, they perform the search for $S_{1}$ in the data structure. This results in a sequence of comparisons and the results of the comparisons form a sequence of $1$s (true) and $0$s (false) which the sender sends to the receiver.</p>
+<p>On the receiving end, the receiver runs a search algorithm without knowing the value of $S_{1}$. This can be done since the receiver is doing exactly the same comparisons and knows the results of the comparisons. This way, the sender can transmit a sequence to the receiver.</p>
+<p>Now, consider the number of bits needed to transmit this sequence and the number of comparisons needed to handle the request sequence, these numbers are the same.</p>
+<h2 id="2-static-optimal-bst"><a class="header" href="#2-static-optimal-bst">2. Static optimal BST</a></h2>
+<p>Assume that all the elements in the request sequence are in the tree, that $p_{i}$ is the probability of access of the element $A_{i}$, and that the entropy $H = \sum_{i=1}^n p_{i} \cdot \log\left( \frac{1}{p_{i}} \right)$.</p>
+<p>The expected cost (number of comparisons), $C$, of the static optimal BST is $\geq H$.</p>
+<h2 id="3-not-all-requested-elements-are-in-the-tree"><a class="header" href="#3-not-all-requested-elements-are-in-the-tree">3. Not all requested elements are in the tree</a></h2>
+<p>Let $p_{i}$ be the probability of access of element $A_{i}$ and $q_{i}$ be the probability of requesting an element between $A_{i}$ and $A_{i+1}$. The entropy is defined as $$H = \sum_{i=1}^n p_{i} \cdot \log\left( \frac{1}{p_{i}} \right) + \sum_{i=0}^n q_{i} \cdot \log\left( \frac{1}{q_{i}} \right)$$
+Note that $C \geq H$ still applies.</p>
+<p><img src="Attachments/Pasted%20image%2020250313141919.png" alt="Pasted image 20250313141919.png" /></p>
+<h1 id="3-nearly-optimal-search-trees"><a class="header" href="#3-nearly-optimal-search-trees">3. Nearly-Optimal Search Trees</a></h1>
+<h2 id="1-p_i-h"><a class="header" href="#1-p_i-h">1. $p_{i}, H$</a></h2>
+<p>Our goal is to achieve $O(H+1)$ query time.
+#final what is the point of the $+1$?
+Edge case of 1/log(n), etc.</p>
+<h2 id="2-idea-probability-splitting"><a class="header" href="#2-idea-probability-splitting">2. Idea: Probability Splitting</a></h2>
+<p>First, we find a key $k_{i}$ such that
+$$\sum_{j=1}^{i-1}p_{j} \leq \frac{1}{2} \sum_{j=1}^n p_{j}$$And
+$$\sum_{j=i+1}^np_{j} \leq \frac{1}{2} \sum_{j=1}^n p_{j}$$</p>
+<p>Let the key $k_{i}$ become the root of a binary search tree, then recurse.</p>
+<p>So, the left subtree is constructed recursively from $(k_{1}, \dots k_{i-1})$ with probabilities $(p_{1}, \dots , p_{i-1})$ and the right subtree is constructed recursively from $(k_{i+1}, \dots k_{n})$ with probabilities $(p_{i+1}, \dots , p_{n})$.</p>
+<p>Let $T$ be the resulting tree.</p>
+<p><strong>Observation:</strong> In $T$, if node $k_{i}$ has depth $\text{depth}<em>T(k</em>{i})$, then
+$$\sum_{k_{j}\in T(k_{i})}p_{j} \leq \frac{1}{2^{\text{depth}<em>T(k</em>{i})}}$$
+Where $T(k_{i})$ is the set of nodes in the subtree rooted at $k_{i}$.</p>
+<p><strong>Theorem:</strong> $T$ can answer queries in $O(H + 1)$ expected time
+<strong>Proof:</strong> As $$p_{i} \leq \sum_{k_{j} \in T(k_{i})} p_{j} \leq \frac{1}{2^{\text{depth}<em>T(k</em>{i})}},$$
+It must be true that
+$$\text{depth}<em>T(k</em>{i}) \leq \log\left( \frac{1}{p_{i}} \right).$$
+Thus, the expected depth of a chosen key is
+$$\sum_{i=1}^n p_{i} \cdot \text{depth}<em>T(k</em>{i}) \leq \sum_{i=1}^n p_{i} \cdot \log\left( \frac{1}{p_i} \right) = H,$$
+yielding a running time of $O(H+1)$.</p>
+<p><strong>Construction</strong></p>
+<ol>
+<li>Finding $k_{i}$</li>
+</ol>
+<p>This takes linear, $\Theta(n)$, time.</p>
+<ol start="2">
+<li>$n$ keys</li>
+</ol>
+<p>$\Theta(n^2)$?</p>
+<p><strong>Better algorithm</strong></p>
+<ol>
+<li>Finding $k_{i}$</li>
+</ol>
+<p>Use binary search instead, $\Theta(n \log n)$</p>
+<p><strong><em>Best</em> Algorithm</strong>*</p>
+<ol>
+<li>Finding $k_{i}$</li>
+</ol>
+<p>Use doubling (exponential) search.</p>
+<ul>
+<li>Check $k_{1}, k_{2}, k_{4}, k_{8}, \dots$ until we find the first $k_{2}^j$ with $2^j \geq i$</li>
+<li>Binary search in $k_{2}^{j-1}, \dots, k_{2}^j$</li>
+</ul>
+<p>This gives us a running time of $\Theta(\log n)$. In fact, it is $\Theta(\log i)$ because $2^j \leq 2i$.</p>
+<p>Idea: search simultaneously starting at $k_{1}$ and working forward, and starting at $k_{n}$ and working backward.</p>
+<p>Then, $k_{i}$ can be found in $O{(\log(\min(i, n-i +1)))}$.</p>
+<p>And the total running time becomes $$T(n) = O(\log(\min (i, n-i +1))) + T(i-1) + T(n-i)$$Which we can prove, by induction that the running time is $O(n)$.</p>
+<h1 id="4-mtf-compression"><a class="header" href="#4-mtf-compression">4. MTF Compression</a></h1>
+<h2 id="1-elias-gamma-coding"><a class="header" href="#1-elias-gamma-coding">1. Elias gamma coding</a></h2>
+<p>Used to code positive, and sometimes, negative integers whose maximum value is not known. There are $i \geq 0$ steps of encoding.</p>
+<ol>
+<li>
+<p>Write down the binary expression of $i$, which uses $\log \lfloor i \rfloor + 1$ bits</p>
+</li>
+<li>
+<p>Prepend it by $\lfloor \log i \rfloor$ $0$'s</p>
+<p>Example: $9 \rightarrow 0001001$</p>
+</li>
+</ol>
+<h2 id="2-a-coding-scheme-that-uses-fewer-bits"><a class="header" href="#2-a-coding-scheme-that-uses-fewer-bits">2. A coding scheme that uses fewer bits:</a></h2>
+<ul>
+<li>
+<p>Gamma code: the leading $0$s encode $\lfloor \log i \rfloor \leq \log i$</p>
+</li>
+<li>
+<p>This number can be encoded using $2\lfloor \log \log i \rfloor + 1$ bits using Elias gamma coding</p>
+<p>Example: $9 \rightarrow 0111001$</p>
+</li>
+</ul>
+<p>So, the number of bits used is $\log i + O(\log \log i)$.</p>
+<h2 id="3-mtf-compression"><a class="header" href="#3-mtf-compression">3. MTF Compression</a></h2>
+<p>Encode $m$ integers from $1$ to $m$.</p>
+<ul>
+<li>
+<p>The sender and receiver each maintain identical lists of $1, 2, \dots, n$</p>
+</li>
+<li>
+<p>To send the symbol $j$ we do not encode $j$ directly. Instead, the sender looks for $j$ in their list and finds it at position $i$.</p>
+</li>
+<li>
+<p>Sender encodes $i$ in $\log i + O(\log \log i)$ bits and sends them to the receiver</p>
+</li>
+<li>
+<p>The receiver decodes $i$, and looks at the $i$th element in the list to find $j$</p>
+</li>
+<li>
+<p>Both move $j$ to the front and continue</p>
+<p>Example: Given the range $1, 2$
+2211112
+21211122</p>
+</li>
+</ul>
+<p><strong>Jensen's inequality:</strong> Let $f: R \rightarrow R$ be a strictly increasing concave function. Then, $\sum_{i=1}^n f(t_{i})$ subject to $\sum_{i=1}^nt_{i} \leq m$ is maximized when $t_{1} = t_{2} = \dots = t_{n} = \frac{m}{n}$.</p>
+<p><strong>Claim:</strong> We can use this to prove that $\text{MTF}$ compresses $S_{1}, \dots S_{m}$ into $$n \log n + m\cdot H + O(n \log \log n + m \log H)$$ bits.</p>
+<p><strong>Proof:</strong> If the number of distinct symbols between two consecutive occurrences of $j$ is $t-1$, then the cost of encoding the second $j$ is $\log(t) + O(\log \log t)$. Therefore, the total cost of encoding all the occurrences of $j$ is</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+#final Where does the $n + O(n \log n)$ term come from? And how do the $t$s stay constant if we are employing MTF?
+$$\begin{gathered} C_{j} \leq \log n + O(\log \log n) + \sum_{i=1}^{m_{j}}(\log t_{i} + O(\log \log t_{i})) \ &amp; \left( \sum_{j=1}t_{j} \leq m \right)\ \leq \log n + O(\log \log n) + m_{j}\left( \log\left( \frac{m}{m_{j}} \right) + O\left( \log \log \frac{m}{m_{j}} \right) \right) \end{gathered}$$
+Where $t_{i} - 1$ is the number of symbols between the $i-1$ and $i$ occurrence of $j$.</li>
+</ul>
+<p>Summing over all $j$, the total number of bits used is</p>
+<p>$$\begin{aligned} &amp;\sum_{j=1}^n C_{j}\ &amp;\leq n \log n + O(n \log \log n) + m \cdot H + \sum_{j=1}^m O\left( m_{j} \log \log \frac{m}{m_{j}} \right) \ &amp; \leq n \log n + m \cdot H + O(n \log \log n + m \log H) \end{aligned}$$</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="resizable-arrays"><a class="header" href="#resizable-arrays">Resizable Arrays</a></h1>
+<p><strong>Definition:</strong> A resizable array $A$ represents $n$ fixed-size elements, each assigned a unique index from $0$ to $n-1$ to support
+$\text{Locate}(i)$: determines the location of $A[i]$
+$\text{Insert}(x):$ store $x$ in $A[n]$, and increment $n$
+$\text{Delete}$: discard $A[n-1]$, decrementing $n$</p>
+<p><strong>Vector?</strong></p>
+<ol>
+<li>No deletion</li>
+</ol>
+<p>Strategy: upon inserting an element into a full array, allocate a new array with twice the size, and copy all the elements, including the new one, over.
+Define:
+$n$: the number of elements in $A$
+$s$: the capacity of $A$
+Load factor $\alpha = \frac{n}{s}$ when $A$ is nonempty, and $=1$ otherwise.
+$\alpha$ is always $\geq \frac{1}{2}$</p>
+<p>Pseudocode:
+$\text{Insert}(x)$:
+If $s=0$
+allocate $A$ with $1$ slot
+$s \leftarrow 1$
+If $n=s$
+allocate $A'$ with $2s$ slots
+copy all elements of $A$ into $A'$
+deallocate $A$
+$A' \leftarrow A$
+$s \leftarrow 2s$
+$A[n] \leftarrow x$
+$n \leftarrow n+1$</p>
+<p>Cost analysis:
+Insert
+If $A$ is not full for the $it$th insert, we simply copy one element, and the cost is $1$.
+Otherwise, the cost is $i$ because we copy $i$ elements.</p>
+<p>[[Amortized Analysis]]:
+Let $A_{i}$ denote the array $A$ after the $i$th insert.
+What should we define our potential as?
+Idea 1: $\phi(A_{i}) = n$
+Problem: $\phi(A_{i}) - \phi(A_{i-1}) = 1$
+Idea 2: $\phi(A_{i}) = n-s$
+Problem: $\phi(A_{i}) \leq 0$
+Idea 3: $\phi(A_{i}) = 2n - s$
+$\phi(A_{0}) = 0$
+And $\phi(A_{i}) \geq 0$ for all $i$
+==Good!==</p>
+<p>To analyze the amortized cost, $a_{i}$, of the $i$th insert, let $n_{i}$ denote the number of elements stored in $A_{i}$ and $S_{i}$ denote the total size of $A_{i}$.</p>
+<p>Now, we need to consider two cases:
+1. The $i$th insert does not require the array to be reallocated
+Then $S_{i} = S_{i-1}$
+Thus, $$\begin{aligned}a_{i} &amp;= C_{i} + \phi(A_{i}) - \phi(A_{i-1})\ &amp;= 1 + (2n_{i} - S_{i}) - (2n_{i-1} - S_{i-1}) \ &amp;= 1 + (2(n_{i-1} + 1) - s_{i-1}) - (2n_{i-1} - S_{i-1}) \ &amp;= 3\end{aligned} $$
+2. The $i$th insert requires a new array to be allocated.
+Then $S_{i} = 2S_{i-1}$ and $S_{i-1} = n_{i-1}$
+And thus $$\begin{aligned}a_{i} &amp;= C_{i} + \phi(A_{i}) - \phi(A_{i-1}) \ &amp;= n_{i} + (2n_{i} - s_{i}) - (2n_{i-1} - S_{i-1})\ &amp;= n_{i-1} + 1 + (2(n_{i-1} + 1) - 2n_{i-1}) - (2n_{i-1} - n_{i-1}) \ &amp;= 3 \end{aligned}$$</p>
+<p>Therefore, the insert operation is $O(1)$ amortized time.</p>
+<p>What about Delete?
+Idea 1: When $\alpha$ is too small, allocate a new, smaller array and copy the elements from the old array to the new array.
+Problem: Would not achieve $O(1)$ amortized time.
+Idea 2: Double the array size when inserting into a full array, halve the array size when deletion would cause the array to be less than half-full.
+Counterexample: For simplicity, assume $n$ is a power of $2$.
+The first $\frac{n}{2}$ operations are insertions, which cause $A$ to be full.
+The next $\frac{n}{2}$ are insert, then two deletes, then two inserts, two deletes, etc. Leading us to spend $\Theta(n)$ time every two operations, and an overall running time of $\Theta(n^2)$
+Idea 3: We need to introduce more slack, what if we only <strong>half</strong> the size of the array when a deletion causes the array to be less than a <strong>quarter</strong>-full?</p>
+<p>Analysis:
+Define $\alpha_{i}$ to be the load factor after the $i$th operation
+$$\phi(A_{i}) = \begin{cases} 2n_{i} - S_{i} \quad \text{if} \quad \alpha_{i} \geq \frac{1}{2} \ \ \frac{S_{i}}{2} - n_{i} \quad \text{if} \quad \alpha_{i} &lt; \frac{1}{2} \ \end{cases}$$
+We now consider two cases:
+1. The $i$th operation is insert (<mark style="background: #ADCCFFA6;">exercise: what four cases did we eliminate here?</mark>)
+1. $\alpha_{i-1} \geq \frac{1}{2}$ and a new array is allocated
+2. $\alpha_{i-1} \geq \frac{1}{2}$ and no new array is allocated
+3. $\alpha_{i-1} &lt; \frac{1}{2}$ and $\alpha_{i} &lt; \frac{1}{2}$
+4. $\alpha_{i-1} &lt; \frac{1}{2}$ and $\alpha_{i} \geq \frac{1}{2}$
+2. The $i$th operation is delete
+1. $\alpha_{i-1} &lt; \frac{1}{2}$ and a new array is allocated
+2. $\alpha_{i-1} &lt; \frac{1}{2}$ and no new array is allocated
+3. $\alpha_{i-1} \geq \frac{1}{2}$ and $\alpha_{i} \geq \frac{1}{2}$
+4. $\alpha_{i-1} \geq \frac{1}{2}$ and $\alpha_{i} &lt; \frac{1}{2}$</p>
+<p>Let's do case 2.1
+$n_{i} = n_{i-1} - 1$
+$S_{i-1} = 4n_{i-1}$
+$S_{i} = \frac{S_{i-1}}{2} = 2n_{i-1}$
+$\alpha_{i} = \frac{n_{i}}{S_{i}} = \frac{n_{i-1} - 1}{2n_{i-1}} &lt; \frac{1}{2}$
+$a_{i} = C_{i} + \phi(A_{i}) - \phi(A_{i-1})$
+$= n_i + \frac{S_{i}}{2} - n_{i} - \left( \frac{S_{i-1}}{2} - n_{i-1} \right)$
+$= (n_{i} -1) + n_{i-1} - (n_{i-1} -1) - 2n_{i-1} + n_{i-1}$
+$= 0$</p>
+<p>Why do we have a factor of $\frac{1}{2}$ in our piecewise definition of $\phi(A_{i})$?
+Try $C(S_{i} - 2n_{i})$ where $C$ is a constant and show why $\frac{1}{2}$ is the best.</p>
+<p><strong>Overhead:</strong> The overhead of a data structure currently storing $n$ elements is the amount of memory usage beyond the minimum required to store $n$ elements.
+<strong>Example: Vector</strong>
+<img src="Attachments/Pasted%20image%2020250121131510.png" alt="Pasted image 20250121131510.png" /></p>
+<p><strong>Lower bound</strong>
+<strong>Claim:</strong> At some point in time, $\Omega({\sqrt{ n }})$ overhead is necessary for any data structure that supports ==inserting== elements and ==locating== any of those elements in some order, where $n$ is the ==number of elements currently stored in the data structure.==
+<strong>Proof:</strong> Consider the following sequence of operations for any $n$:
+$Insert(a_{1}), Insert(a_{2}), Insert(a_{3}), \dots Insert(a_{n})$
+After inserting $a_{n}$, let $k(n)$ be the number of memory blocks occupied by the data structure and $S(n)$ be the size of the largest of those blocks.  Hence,  $S(n)\cdot k(n) \geq n$.
+<img src="Attachments/Pasted%20image%2020250121133028.png" alt="Pasted image 20250121133028.png" />
+At this time, the overhead is at least $k(n)$ to store bookkeeping information (e.g. address) for each block.
+Furthermore, after the allocation of the block of size $S(n)$, the overhead is at least $S(n)$
+The worst-case overhead is at least $\max(S(n), k(n))$.
+Since $S(n) \cdot k(n) \geq n$, at some point, the overhead is at least $\sqrt{ n }$ (==because like we just stated, the overhead is the larger of the two and their product is larger than $n$)==.</p>
+<p><strong>An optimal solution</strong>
+<strong>Model: RAM</strong>
+$Allocate(S)$: Returns a new block of size $S$. $\rightarrow O(1)$ ($O(s)$ if initialization required)
+$Deallocate(B)$: Free the space used by the given block. $B$ $\rightarrow O(1)$  ($O(s)$ if initialization required)
+$Reallocate(B, S)$: If possible, resize block $B$ to size $S$. Otherwise, allocate a block of size $S$, copy the content of $B$ into a new block, and deallocate $B$. $\rightarrow O(s)$</p>
+<p><strong>Two approaches that do not work</strong></p>
+<ol>
+<li>Try to store elements in $\theta(\sqrt{ n })$ blocks, where the size of the largest block is $\theta(\sqrt{ n })$</li>
+</ol>
+<p>Issues:
+$locate(i)$: the element is in the $\left\lceil \frac{\sqrt{ 1 + 8i } - 1}{2} \right\rceil$th block and the ==RAM model is not naturally equipped with $\sqrt{ x}$.==</p>
+<ol start="2">
+<li></li>
+</ol>
+<p>$locate(i)$
+Block: number of bits in ($i+1$)$_{2} - 1$
+Issue: the size of the largest block is $\theta(n)$</p>
+<p><strong>Solution: combine two ideas</strong>
+<strong>Index block:</strong>
+<strong>Data blocks:</strong>
+- <strong>Index block:</strong> pointers to data blocks
+- <strong>Data blocks</strong> $(DB_{0}, DB_{1}, \dots, DB_{d-1})$: elements
+- <strong>Super blocks</strong> $(SB_{0}, SB_{1}, SB_{s-1})$
+- Data blocks are grouped into super blocks
+- Data blocks in the same superblock are of the same size
+- When $SB_{k}$ is fully allocate, it consists of  $2^{\lfloor k/2\rfloor}$ data blocks, each of size $2^\left\lceil \frac{k}{2} \right\rceil$
+- Size of $SB_{k}$ is $2^k$
+- Only $SB_{s-1}$ might not be fully allocated</p>
+<p><img src="Attachments/Screenshot%202025-01-23%20at%201.20.38%20PM.png" alt="Screenshot 2025-01-23 at 1.20.38 PM.png" />
+<strong>Locate($i$)</strong></p>
+<p>$\rightarrow$ Let $r$ denote the binary expression of $i+1$ without leading $0$s.
+$\rightarrow$ Element $i$ is element $e$ of data block $b$ of superblock $k$.
+$\rightarrow$ $k = |r|-1$
+$\rightarrow$ $b$ is $\left\lfloor \frac{k}{2} \right\rfloor$ bits of $r$ immediately after the leading $1$ bit
+$\rightarrow$ $e$ is the last $\left\lceil \frac{k}{2} \right\rceil$ bits of $r$
+$\rightarrow$ The number of data blocks in superblocks before $SB_{k}$ is
+$$p = \sum_{j=0}^{k-1} 2^{\lfloor j/2 \rfloor}$$
+<em>depending on whether $k$ is even or odd we use different geometric series</em>
+$$= \cases{2\cdot\left( \frac{2^k}{2} - 1 \right)\text{ if $k$ is even} \ 3 \cdot {2}^{(k-1)/2} - 2 \text{ otherwise}}$$
+$\rightarrow$ Return the location of element $e$ in data block $DB_{p+b}$ (the $b$th data block in the super block plus the offset)</p>
+<p><strong>Updates</strong></p>
+<ul>
+<li>Some easy-to-maintain bookkeeping information
+<ul>
+<li>$n, s, d$ (nonempty)</li>
+<li>The number of empty data blocks $(0 \text{ or } 1)$</li>
+<li>Size and occupancy of the last nonempty data block, data block, the last superblock, the index block
+<ul>
+<li>The index block is maintained as a vector</li>
+</ul>
+</li>
+<li>$Insert(x)$</li>
+</ul>
+</li>
+</ul>
+<p>a) If $SB_{s-1}$ is full, we <strong>increment $s$ by $1$</strong>
+b) If $DB_{d-1}$ is full, and there is no empty data block, we increment $d$ by $1$ and allocate a new data block $DB_{d-1}$
+c) If $DB_{d-1}$ is full and there is an empty data block, increment $d$ by $1$ and $DB_{d-1}$ is set to be an empty data block (?)</p>
+<p><strong>Store $x$ in $DB_{d-1}$</strong></p>
+<ul>
+<li><strong>Delete:</strong>
+<ul>
+<li>Remove the last element from $DB_{d-1}$</li>
+<li>If $DB_{d-1}$ is empty
+<ul>
+<li>$d \leftarrow d-1$</li>
+<li>If there is another empty data block, we deallocate it</li>
+</ul>
+</li>
+<li>If $SB_{s-1}$ is empty, we decrement $s$ by $1$.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Space Bound</strong></p>
+<ul>
+<li>$S = \lceil \log(1 + n) \rceil$
+<strong>Proof</strong>
+The number of elements in the first $s$ superblocks is $\sum_{i=0}^{s-1} 2^i = 2^s - 1 \text{ (geometry series)}$
+If we let this equal $n$, then $s = \log(1+n)$
+For slightly smaller $n$, the same number of superblocks is required. Hence, we take the ceiling.</li>
+<li>The number of data blocks is $O(\sqrt{ n })$
+<ul>
+<li>There is at most one empty data block, so it is sufficient to only consider the number of nonempty data blocks $d = O(\sqrt{ n })$</li>
+<li>$d \leq \sum_{i=0}^{s-1}2^{\lfloor i/2\rfloor} \leq \sum_{i=0}^{s-1}2^{i/2} = \frac{2^{s/2} - 1}{\sqrt{ 2 } - 1} \text{ (geometry series) }$</li>
+<li>$2^s = O(n)$ so, $2^{s/2} = O(\sqrt{ n })$</li>
+</ul>
+</li>
+<li>The last (empty or nonempty) data block has size $\theta(\sqrt{ n })$
+<strong>Proof</strong>
+The size of $DB_{d-1} = 2^{\lceil (s-1)/2 \rceil} = \theta(\sqrt{ n })$
+If there is an empty data block, it either has the same size or <strong>twice</strong> the size.
+Total overhead: $O(\sqrt{ n })$</li>
+</ul>
+<p><strong>Update time</strong></p>
+<ul>
+<li>If allocate or deallocate is called when $n= n_{0}$ then the next call to allocate or deallocate will occur after $\Omega(\sqrt{ n_{0} })$ operations (this guarantees $O(1)$ amortized time even if initialization is needed).
+<strong>Proof:</strong>
+Immediately after allocating or deallocating a data block, there is exactly one empty data block. We only deallocate a data block when two are empty, so we must call <strong>Delete</strong> at least as many times as the size of the largest nonempty data block $DB_{d-1}$ which is $\Omega(\sqrt{ n_{o} })$. We only allocate a data block when this data block is full, which requires $\Omega(\sqrt{ n_{o} })$ insertions.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="self-adjusting-binary-trees"><a class="header" href="#self-adjusting-binary-trees">Self-Adjusting Binary Trees</a></h1>
+<h1 id="1-problem"><a class="header" href="#1-problem">1. Problem</a></h1>
+<h2 id="1-given-a-sequence-of-access-queries-what-is-the-best-way-to-organize-the-binary-search-tree"><a class="header" href="#1-given-a-sequence-of-access-queries-what-is-the-best-way-to-organize-the-binary-search-tree">1. Given a sequence of access queries, what is the best way to organize the binary search tree?</a></h2>
+<h2 id="2-model"><a class="header" href="#2-model">2. Model</a></h2>
+<ul>
+<li>Search must start at the root</li>
+<li>Cost: number of nodes inspected</li>
+</ul>
+<h2 id="3-worst-case"><a class="header" href="#3-worst-case">3. Worst-case</a></h2>
+<p>$\Theta(\log n)$ upper and lower bounds</p>
+<h1 id="2-static-optimal-bst-1"><a class="header" href="#2-static-optimal-bst-1">2. Static optimal BST</a></h1>
+<h2 id="1-problem-1"><a class="header" href="#1-problem-1">1. Problem</a></h2>
+<p>We store elements $A_{1} &lt; A_{2} &lt; \dots &lt; A_{n}$. We are also given $p_{i}$, the probability of access for element $A_{i}$, and $q_{i}$, the probability of access for values between $A_{i}$ and $A_{i+1}$ (unsuccessful accesses). Also, we define $$\begin{gathered} A_{0} = -\infty, \quad A_{n+1} = \infty \ p_{0} = p_{n+1} = 0\end{gathered}$$
+Let $T[i, j]$ be the root of the optimal tree on range $q_{i-1}$ to $q_{j}$. The cost of the tree rooted at $T[i,j]$ is $$\sum \text{probability of looking for one of these values (gaps) in the range} \times \text{the cost of doing this in that tree}$$
+<img src="Attachments/Pasted%20image%2020250304134234.png" alt="Pasted image 20250304134234.png" /></p>
+<h2 id="3-dynamic-programming"><a class="header" href="#3-dynamic-programming">3. Dynamic programming</a></h2>
+<p>Observation
+<img src="Attachments/Pasted%20image%2020250304134648.png" alt="Pasted image 20250304134648.png" /></p>
+<p>It will be handy to have $W[i,j]$, the probability of accessing any node/gap $q_{i-1}, \dots, q_{j}$ or $p_{i}, \dots, p_{j}$.
+$$W[i,j] = \sum_{k=i}^j p_{k} + \sum_{k= i-1}^j q_{k}$$
+$$W[i, j+1] = W[i, j] + p_{j+1} + q_{j+1}$$
+All the entries of $W[i,j]$ can be computed in $O(n^2)$ time.
+#final why are we adding the probabilities to get the cost?
+$$C[i,j] = \cases{0 \quad \text{if} \quad j = i-1 \ W[i, j] + \min_{r = i}^j (C[i, r-1] + C[r+1, j]) \quad \text{if} \quad i \leq j}$$
+<strong>OPTIMAL-BST($p, q, n$)</strong>
+for $i \leftarrow 1$ to $n+1$
+$C[i, i-1] \leftarrow 0$
+$W[i, i-1] \leftarrow q_{i-1}$
+for $l \leftarrow 1$ to $n$
+for $i \leftarrow 1$ to $n - l +1$
+$j \leftarrow i + l -1$
+$C[i, j ] \leftarrow \infty$
+$W[i,j] \leftarrow W[i, j-1] + p_{i} + q_{j}$
+for $r \leftarrow i$ to $j$
+$t \leftarrow C[i, r-1] + C[r+1, j] + W[i,j]$
+if $t &lt; C[i,j]$
+$C[i,j] \leftarrow t$
+$T[i,j] \leftarrow r$</p>
+<p>Running time: $O(n^3)$
+But $O(n^2)$ time is possible!</p>
+<h1 id="3-splay-trees"><a class="header" href="#3-splay-trees">3. Splay trees</a></h1>
+<h2 id="1-on-accessing-a-node-we-move-splay-it-to-the-root-by-a-sequence-of-local-moves"><a class="header" href="#1-on-accessing-a-node-we-move-splay-it-to-the-root-by-a-sequence-of-local-moves">1. On accessing a node, we move (splay) it to the root by a sequence of local moves</a></h2>
+<h2 id="2-splaying"><a class="header" href="#2-splaying">2. Splaying</a></h2>
+<p>We let $x$ be a node being moved toward the root, $y$ be its parent, and $z$ be $y$'s parent. There are $3$ cases of splaying:</p>
+<ol>
+<li>Zig step</li>
+</ol>
+<p>If $y$ is the root, we rotate $x$ so that it becomes the root (single rotation).</p>
+<p><img src="Attachments/Pasted%20image%2020250304141920.png" alt="Pasted image 20250304141920.png" />
+2. Zig-zig step</p>
+<p>If $y$ is not the root and $x$ and $y$ are both left or both right children, and we first rotate $y$ then rotate $x$.</p>
+<p><img src="Attachments/Pasted%20image%2020250304142354.png" alt="Pasted image 20250304142354.png" /></p>
+<ol start="3">
+<li>Zig-zag step</li>
+</ol>
+<p>If $y$ is not the root, and $x$ is a left child while $y$ is a right child, or vice versa, then we double rotate $x$.</p>
+<p><img src="Attachments/Pasted%20image%2020250306131357.png" alt="Pasted image 20250306131357.png" />
+<strong>Running time analysis</strong></p>
+<ul>
+<li>Splaying a node $x$ of depth $d$: $O(d)$</li>
+</ul>
+<p>Example: single rotation of $x$ only (not splaying)
+<img src="Attachments/Pasted%20image%2020250306132241.png" alt="Pasted image 20250306132241.png" />
+<strong>Splaying</strong>
+<img src="Attachments/Pasted%20image%2020250306133048.png" alt="Pasted image 20250306133048.png" />
+<strong>Intuition:</strong> splaying roughly halves the length of the access path</p>
+<p><strong>Definitions:</strong></p>
+<ul>
+<li>$w(i)$ is the weight of item $i$ (positive)</li>
+<li><input disabled="" type="checkbox"/>
+#final are items leaves? no</li>
+<li>$s(x)$ is the size of a node $x$ in the tree; sum of weights of all individual items in the subtree rooted at $x$</li>
+<li>$r(x)$ is the rank of node $x$; defined as $\log(s(x))$</li>
+<li>The potential, $\phi$, of the tree is the sum of the ranks of all its nodes</li>
+</ul>
+<p>Note: $\phi_{i}$ is not necessarily nonnegative $$\sum_{i=1}^nC_{i} = \sum_{i=1}^m a_{i} + \phi_{0} - \phi_{m}$$
+The cost if the number of rotations.</p>
+<p><strong>Access lemma:</strong> the amortized time to splay a tree with root $t$ at node $x$ is at most $$3(r(t) - r(x)) + 1 = O\left( \log\left( \frac{s(t)}{s(x)} \right) \right)$$
+<strong>Proof:</strong></p>
+<p>If there are no rotations ($x$ happens to be $t$), then the bound is immediate (cost is $0$).</p>
+<p>So, assume that there is at least one rotation and consider the first splaying step. There are three cases for this step</p>
+<ol>
+<li>Zig</li>
+<li>Zig-zig</li>
+<li>Zig-zag</li>
+</ol>
+<p>Let $r_{0}(i)$, $r_{1}(i)$ and $s_{0}(i), s_{1}(i)$ represent the rank and size of node $i$ before and after the first step. Also, let $y$ be the parent $x$, $z$ be the parent of $y$.</p>
+<ol>
+<li>Zig</li>
+</ol>
+<p>$y$ is the root, so $y = t$.
+<img src="Attachments/Pasted%20image%2020250306135753.png" alt="Pasted image 20250306135753.png" />
+The actual cost for a single rotation is just $1$. The amortized cost is</p>
+<p>$$\begin{gathered} 1 + \phi_{1} - \phi_{0} = 1+ (r_{1}(x) <em>+ r</em>{1}(y)) - (r_{0}(x) + r_{0}(y)) \\leq 1 + r_{1}(x) - r_{0}(x) \\leq 1 + 3(r_{1}(x) - r_{0}(x)) \end{gathered}$$</p>
+<p>(we only include ranks of $x$ and $y$ because they're the only nodes that gain/lose descendants, the rank of $x$ increases while that of $y$ decreases)</p>
+<ol start="2">
+<li>Zig-zig step</li>
+</ol>
+<p><img src="Attachments/Pasted%20image%2020250306140600.png" alt="Pasted image 20250306140600.png" />
+Amortized cost is
+$$\begin{gathered} 2 + r_{1}(x) + r_{1}(y) + r_{1}(z) - r_{0}(x) - r_{0}(y) - r_{0}(z) \ = 2+ + r_{1}(y) + r_{1}(z) - r_{0}(x) - r_{0}(y) &amp; (\text{because } r_{1}(x) = r_{0}(z)) \ \leq 2 + r_{1}(x) + r_{1}(z) - r_{0}(x) - r_{0}(x) &amp; (\text{because } r_{1}(x) \geq r_{1}(y), \ r_{0}(x) \leq r_{0}(y)) \ \end{gathered}$$
+We now show
+$$\begin{gathered} 2 + r_{1}(x) + r_{1}(z) - 2r_{0}(x) \leq 3(r_{1}(x) - r_{0}(x)) \iff r_{1}(z) + r_{0}(x) - 2r_{1}(x) \leq -2 \ r_{1}(z) + r_{0}(x) - 2r_{1}(x) \ = (r_{1}(z) - r_{1}(x)) + (r_{0}(x) - r_{1}(x)) \ \log\left( \frac{s_{1}(z)}{s_{1}(x)} \right) + \log\left( \frac{s_{0}(x)}{s_{1}(x)} \right) = \log\left( \frac{s_{1}(z)}{s_{1}(x)} \cdot \frac{s_{0}(x)}{s_{1}(x)}\right) \end{gathered}$$
+Since $s_{1}(x) \geq s_{1}(z) + s_{0}(x)$,
+$$\begin{gathered} \frac{s_{1}(z)}{s_{1}(x)} + \frac{s_{0}(x)}{s_{1}(x)} \leq 1 \end{gathered}$$
+Then $$\frac{s_{1}(z)}{s_{1}(x)} \cdot \frac{s_{0}(x)}{s_{1}(x)} \leq \frac{1}{4}$$
+Because, apparently, $\sqrt{ ab } \leq \frac{a+b}{2}$</p>
+<p>Therefore, $$\begin{gathered} r_{1}(z) + r_{0}(x) - 2r_{1}(x) \ \leq \log\left( \frac{1}{4} \right) \ = -2 \end{gathered}$$'
+Hence, the amortized cost is $\leq 3(r_{1}(x) - r_{0}(x))$</p>
+<ol start="3">
+<li>Zig-zag step</li>
+</ol>
+<p>We double-rotate
+<img src="Attachments/Pasted%20image%2020250311131931.png" alt="Pasted image 20250311131931.png" />Amortized cost calculation:</p>
+<h2>$$\begin{gathered} &amp; 2 + r_{1}(x) + r_{1}(y) + r_{1}(z) - r_{0}(x) - r_{0}(y) - r_{0}(z) \ &amp; = 2 + r_{1}(y) + r_{1}(z) - r_{0}(x) - r_{0}(y) \ \text{Since } r_{0}(x) &lt; r_{0}(y), \ &amp; = 2 + r_{1}(y) + r_{1}(z) - 2r_{0}(x) \ \text{We now show } 2 + r_{1}(y) + r_{1}(z) - 2r_{0}(x) \leq 3(r_{1}(x) - r_{0}(x)) \ \text{This is equivalent to }\ &amp; r_{1}(y) + r_{1}(z) + r_{0}(x) - 3r_{1}(x) \leq -2 \ \text{Note that } \ &amp; r_{1}(y) + r_{1}(z) + r_{0}(x) - 3r_{1}(x) = \log\left( \frac{s_{1}(y)}{s_{1}(x)} \cdot \frac{s_{1}(z)}{s_{1}(x)} \right) + r_{0}(x) - r_{1}(x)\ \text{Since } s_{1}(x) \geq s_{1}(y) + s_{1}(z), \ &amp; \leq \log \frac{1}{4} = -2 \end{gathered}$$
+Suppose a splay operation requires $k &gt; 1$ steps, then only the $k$th (last) step can be a zig step. The amortized cost of the whole splay operation is at most $$\begin{gathered} 3r_{k}(x) - 3r_{k-1}(x) + 1 + \sum_{j=1}^{k-1}(3r_{j}(x) - 3r_{j-1}(x)) \ = 3r_{{k}}(x) - 3r_{k-1}(x) + 1 + 3r_{k-1}(x) - 3r_{0}(x) \ = 3r_{k}(x) - 3r_{0}(x) + 1 \end{gathered}$$</h2>
+<p>The <strong>Balance Theorem</strong> states that given a sequence of $m$ accesses into an $n$-node splay tree $T$, the total access time is $O((m+n) \cdot \log(n) + m)$.</p>
+<p><strong>Proof:</strong></p>
+<p>We assign a weight of $\frac{1}{n}$ to each item. Then,
+$$\frac{1}{n} \leq s(x) \leq 1$$</p>
+<p>Therefore, the amortized cost of any access is at most $$\leq 3 \left( \log(1) - \log\left( \frac{1}{n} \right) \right) + 1 = 3 \log(n)+1$$
+The maximum potential of $T$ is
+$$\begin{gathered} \sum_{i=1}^n \log(s_{i}) \leq \sum_{i=1}^n \log(1) = 0 \end{gathered}$$
+The minimum potential of $T$ is
+$$\sum_{i=1}^n \log(s_{i}) \geq \sum_{i=1}^n \log\left( \frac{1}{n} \right) = -n \log (n)$$
+Therefore,
+$$\phi_{0} - \phi_{m} \leq 0 - (-n \log n) = n \log n$$
+And the total <strong>actual</strong> cost is
+$$\begin{gathered} \leq m(3 \log n + 1) + \phi_{0} - \phi_{m} \ = 3m\log(n) + m + n \log n \ = O((m+n) \log n + m) \end{gathered} $$</p>
+<p>But what does this mean?</p>
+<p>$\rightarrow$ If we access $m \geq n$ times, the average cost per access is $\frac{O(m \log n + m)}{m} = O(\log n)$</p>
+<hr />
+<p>The <strong>Static Optimality</strong> theorem states that given a sequence of $m$ access into an $n$-node splay tree, where each item is accessed at least once, then the total access time is $O\left( m+\sum_{i=1}^n q(i) \log\left( \frac{m}{q_{i}} \right) \right)$ where $q_{i}$ is the number of times item $i$ is accessed.</p>
+<p><strong>Proof:</strong></p>
+<p>We assign a weight of $\frac{q_{i}}{m}$ to each item $i$. Then, $$\frac{q(x)}{m} \leq s(x) \leq 1$$
+The amortized cost of $n$ accesses is at most $$\leq 3 \left( \log(1) - \log\left( \frac{q(x)}{m} \right) \right) + 1 = 3 \log\left( \frac{m}{q(x)} \right)+1$$
+And
+$$\phi_{0} - \phi_{m} \leq 0 - \sum_{i=1}^n\log\left( \frac{q(i)}{m} \right) = \sum_{i=1}^n \log\left( \frac{m}{q(i)} \right)$$
+And the total actual cost is
+$$\leq 3 \sum_{i=1}^n q(i) \log\left( \frac{m}{q(i)} \right) + m + \sum_{i-1}^n \log\left( \frac{m}{q(i)} \right) \leq O\left( m + \sum_{i=1}^n q(i) \log\left( \frac{m}{q(i)} \right)\right)$$</p>
+<p>We define the following as the <strong>entropy of access</strong> $\times m$
+$$\sum_{i=1}^nq(i) \log\left( \frac{m}{q(i)} \right)$$</p>
+<h2 id="3-update"><a class="header" href="#3-update">3. Update</a></h2>
+<p><strong>Insertion</strong></p>
+<ol>
+<li>Insert as a new leaf</li>
+<li>Splay at the new node (the leaf that got turned into a node?)</li>
+</ol>
+<p><img src="Attachments/Pasted%20image%2020250311141953.png" alt="Pasted image 20250311141953.png" />
+<strong>Deletion</strong></p>
+<ol>
+<li>Delete the node (creating 3 disconnected trees)</li>
+<li>Splay the largest value in its left subtree</li>
+<li>The right subtree becomes a subtree of the new root of the left subtree</li>
+<li>Replace the deleted node by the new root of these two subtrees connected together</li>
+<li>Splay at $x$'s parent</li>
+</ol>
+<p><img src="Attachments/Pasted%20image%2020250311142717.png" alt="Pasted image 20250311142717.png" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="self-adjusting-lists"><a class="header" href="#self-adjusting-lists">Self-Adjusting Lists</a></h1>
+<h3 id="1-problem-linear-search"><a class="header" href="#1-problem-linear-search">1. Problem: linear search</a></h3>
+<p>Given $n$ elements, and a key for an element, search for it by linearly iterating through the list.</p>
+<p>Worst case: $n$ comparisons</p>
+<p>Average case: If all elements have equal probability of search, then the expected time is $\frac{n+1}{2}$ in successful case and $n$ for an unsuccessful.</p>
+<ul>
+<li>How did we get $\frac{n+1}{2}$?
+$$\begin{aligned} \frac{1}{n}\cdot 1 + \frac{1}{n} \cdot 2 + \frac{1}{n} \cdot 3 + \dots + \frac{1}{n} \cdot n \= \frac{1}{n}(1+2+ \dots + n) \= \frac{n+1}{2} \end{aligned}$$</li>
+</ul>
+<h3 id="2-real-questions"><a class="header" href="#2-real-questions">2. Real Questions</a></h3>
+<h4 id="1-what-if-the-probabilities-of-access-differ"><a class="header" href="#1-what-if-the-probabilities-of-access-differ">1. What if the probabilities of access differ?</a></h4>
+<p>Let $p_{i}$ be the probability of requesting element $i$.</p>
+<h4 id="2-what-if-these-independent-probabilities-are-not-given"><a class="header" href="#2-what-if-these-independent-probabilities-are-not-given">2. What if these (independent) probabilities are not given?</a></h4>
+<h4 id="3-how-do-solutions-compare-with-the-best-we-could-do"><a class="header" href="#3-how-do-solutions-compare-with-the-best-we-could-do">3. How do solutions compare with the best we could do</a></h4>
+<h3 id="3-self-adjusting-data-structures---adapt-to-changing-probabilities"><a class="header" href="#3-self-adjusting-data-structures---adapt-to-changing-probabilities">3. Self-adjusting data structures - Adapt to changing probabilities</a></h3>
+<h4 id="1-if-probabilities-are-the-same-and-independent-it-doesnt-matter-how-you-change-the-structure"><a class="header" href="#1-if-probabilities-are-the-same-and-independent-it-doesnt-matter-how-you-change-the-structure">1. If probabilities are the same and independent, it doesn't matter how you change the structure</a></h4>
+<h4 id="2-if-both-probabilities-and-list-are-fixed-minimize-sum_i1n-i-p_i"><a class="header" href="#2-if-both-probabilities-and-list-are-fixed-minimize-sum_i1n-i-p_i">2. If both probabilities and list are fixed, minimize $\sum_{i=1}^n i p_{i}$</a></h4>
+<p>Greedy: element with the highest probability should be placed first.</p>
+<p>Let $S_{opt}$ be the starting optimal solution.</p>
+<h4 id="3-how-can-we-adapt-to-changes-in-probability-or-self-adjust"><a class="header" href="#3-how-can-we-adapt-to-changes-in-probability-or-self-adjust">3. How can we adapt to changes in probability or self-adjust?</a></h4>
+<p>Move elements forward as accessed.</p>
+<p>Heuristics:</p>
+<ul>
+<li>Move-to-front (MTF): after an item is accessed, move it to the front of the list.</li>
+<li>Transpose (TR): After an item is accessed, exchange it with the immediate preceding item.</li>
+<li>Frequency count (FC): Maintain a frequency count for each item, initially $0$. Increase the count of an item by $1$ whenever it is accessed. Maintain a list such that the items are in decreasing order by frequency count.</li>
+</ul>
+<h3 id="4-static-optimality"><a class="header" href="#4-static-optimality">4. Static optimality</a></h3>
+<h4 id="1-compare-mtf-to-s_opt"><a class="header" href="#1-compare-mtf-to-s_opt">1. Compare MTF to $S_{opt}$</a></h4>
+<h3 id="2-model-1"><a class="header" href="#2-model-1">2. Model</a></h3>
+<p>Start with an empty list.
+Scan for elements requested. If not present
+Insert (and change) as if found at the end of the list (then apply heuristic)</p>
+<p>Cost: number of comparisons</p>
+<h4 id="3-the-cost-of-mtf-leq-2cdot-s_opt-for-any-sequence-of-requests"><a class="header" href="#3-the-cost-of-mtf-leq-2cdot-s_opt-for-any-sequence-of-requests">3. The cost of MTF $\leq 2\cdot S_{opt}$ for any sequence of requests</a></h4>
+<p><strong>Proof</strong></p>
+<p>Consider an arbitrary list, but focus on searches for $b$, $c$ (two arbitrary elements), and "unsuccessful comparisons" where we compare query value $b$ against $c$ or $c$ against $b$.</p>
+<p>Assume the request sequence has $k$ $b$'s and $m$ $c$'s (no assumption on order of searches). Without loss of generality, assume that $k \leq m$.</p>
+<p>$S_{opt}$ order is $c b$ and there are $k$ unsuccessful comparisons.</p>
+<p>What order of requests maximizes this number under MTF?</p>
+<p>Clearly, $C^{m-k}(bc)^k$.</p>
+<p>There are $2k$ unsuccessful comparisons.</p>
+<p>Under MTF, an unsuccessful comparison will happen whenever the request sequence changes, from $b$ to $c$ or $c$ to $b$.</p>
+<p>Since each change involves a $b$ and each $b$ can be involved in at most two changes, the total number of such changes is $\leq 2k$.</p>
+<p>This holds for any pair of elements, sum over all the total number of unsuccessful comparisons of MTF
+$$\leq 2 \cdot \dots \cdot S_{opt}$$</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+🔼 What is this?</li>
+</ul>
+<p>We also observe that the total number of successful comparisons of MTF and the total number of successful comparisons of $S_{opt}$ are equal.</p>
+<p>And the number of cost of MTF is at most $2 \cdot S_{opt}$.</p>
+<h4 id="4-this-bound-is-tight"><a class="header" href="#4-this-bound-is-tight">4. This bound is tight.</a></h4>
+<p>Given $a_{1}, a_{2}, a_{3}, \dots , a_{n}$, we repeatedly ask for the last element in the list. So, the elements are requested equally often.</p>
+<p>The cost of MTF is $n$ comparisons per search. But for the $S_{opt}$, every item has the same probability of being accessed, so the cost is $\frac{n+1}{2}$.</p>
+<h4 id="5-for-some-sequences-mtf-does-much-better"><a class="header" href="#5-for-some-sequences-mtf-does-much-better">5. For some sequences, MTF does much better</a></h4>
+<p>Consider the following sequence of requests
+$$a_{1}^n \ a_{2}^n \dots a_{n}^n$$
+The cost of $S_{opt}$ would be $\frac{n+1}{2}$</p>
+<p>The cost of MTF would be
+$$\begin{aligned} \frac{(1+(n-1)) + (2+(n-1)) + (3+(n-1)) + \dots + (n + (n-1))}{n^2}\ = \frac{\frac{n(n+1)}{2} + n(n-1)}{n^2} \ = \frac{3}{2} - \Theta\left( \frac{1}{n} \right) \end{aligned}$$</p>
+<h3 id="5-dynamic-optimality"><a class="header" href="#5-dynamic-optimality">5. Dynamic optimality</a></h3>
+<h4 id="1-online-vs-offline"><a class="header" href="#1-online-vs-offline">1. Online vs Offline</a></h4>
+<ul>
+<li>Online: Must respond as requests come</li>
+<li>Offline: Get to see the entire schedule and determine how to move values</li>
+</ul>
+<h4 id="2-competitive-ratio-of-alg"><a class="header" href="#2-competitive-ratio-of-alg">2. Competitive ratio of $Alg$</a></h4>
+<p>$=$ worst case of $\frac{\text{Online time of }Alg}{\text{Optimal offline time}}$</p>
+<h4 id="3-a-method-is-competitive-if-this-ratio-is-a-constant"><a class="header" href="#3-a-method-is-competitive-if-this-ratio-is-a-constant">3. A method is "competitive" if this ratio is a constant</a></h4>
+<h4 id="4-model"><a class="header" href="#4-model">4. Model</a></h4>
+<ul>
+<li>Search for or change element in position $i$: scan to location $i$ at cost $i$</li>
+<li>Free exchange: exchanges (swaps) between adjacent elements that are required to move element $i$ closer to the front are free of cost</li>
+<li>Paid exchange: any other exchange (swapping) between adjacent elements costs $1$</li>
+</ul>
+<p><strong>Before cost of self-adjusting</strong></p>
+<ul>
+<li>$Access$: costs $i$ if element is in position $i$</li>
+<li>$Delete$: costs $i$ if element is in position $i$</li>
+<li>$Insert$: costs $n+1$ if $n$ elements are already there</li>
+</ul>
+<h4 id="5-definitions"><a class="header" href="#5-definitions">5. Definitions</a></h4>
+<ul>
+<li>Request sequence: $M$ queries, $n$ max data values</li>
+<li>Start with empty list</li>
+<li>Cost model for a search that ends with finding the element at position $i$ is $i +$ number of paid exchanges</li>
+<li>$C_{A}(S)$: the total cost of all operations for an algorithm $A$, not counting paid exchanges</li>
+<li>$X_{A}(S)$: number of paid exchanges
+$$X_{MTF}(S) = X_{TR}(S) = X_{FC}(S) = 0$$</li>
+<li>$F_{A}(S)$: number of free exchanges</li>
+</ul>
+<p><strong>Observation:</strong> $F_{A}(S) \leq C_{A}(S) - M$
+After accessing the $i$th element,  there are $\leq i - 1$ free exchanges.</p>
+<p><strong>Claim:</strong> $C_{MTF} \leq 2 C_{A}(S) + X_{A}(S) - F_{A}(S) - M$ for any algorithm $A$ starting with an empty set</p>
+<p><strong>Proof:</strong></p>
+<p>We run $A$ and $MTF$ in parallel, on the same request sequence $S$. The potential function $\phi$ is defined as the number of inversions* between $MTF$'s list and $A$'s list. Now, we bound the time of $access$.</p>
+<p>Consider access by $A$ to position $i$ and assume we go to position $k$ is $MTF$'s list. Let $x_{i}$ be the number of items preceding the element in $MTF$'s list but not $A$'s list. So, the number of items preceding it in both lists is $k-1 - x_{i}$.</p>
+<p>Moving the element to front in $MTF$'s list creates $k - 1 - x_{i}$ (between the element and those that used to precede it), and destroys $x_{i}$ inversions.</p>
+<p>Amortized analysis:
+$$k + (k-1-x_{i}) - x_{i} = 2(k-x_{i}) - 1$$
+Since $k-1-x_{i} \leq i-1$, we can conclude that $k-x_{i} \leq i$.</p>
+<p>This gives us an amortized time of $\leq 2i - 1 = 2C_{A} - 1$ where $C_{A}$ is the cost of access for $A$ without exchanges (similar to insert/delete). An exchange by $A$ has $0$ cost to $MTF$, so the amortized time of an exchange by $A$ is increased in the number of inversions caused by exchange: $1$ for paid, $-1$ for free.</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+#skipped for now ...
+So, the total amortized cost is
+$$2C_{A}(S) - M + X_{A}(S) - F_{A}(S)$$</li>
+</ul>
+<p><strong>Conclusion</strong></p>
+<p>MTF is $2$-competitive</p>
+<p>$$\begin{aligned} T_{A}(S) &amp;= C_{A}(S) + X_{A}(S) \ T_{MTF}(S) &amp;= C_{MTF}(S) \ &amp;\leq 2C_{A}(S) + X_{A}(S) - F_{A}(S) - M \ &amp;\leq 2T_{A}(S) \end{aligned}$$
+* An inversion is defined as any pair of elements that appear in different orders relative to each other in different lists.</p>
+<p><img src="Attachments/Pasted%20image%2020250302145329.png" alt="Pasted image 20250302145329.png" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="succinct-data-structures"><a class="header" href="#succinct-data-structures">Succinct Data Structures</a></h1>
+<h1 id="1-number-of-trees-on-n-nodes"><a class="header" href="#1-number-of-trees-on-n-nodes">1. Number of trees on $n$ nodes</a></h1>
+<ol>
+<li>Binary trees</li>
+</ol>
+<p>Catalan number $$C_{n} \equiv \frac{\binom{2n}{n}}{n+1}$$
+2. Ordinal trees</p>
+<p>Defined as $$\text{child }1, \text{ child } 2, \text{ child } 3, \ \dots$$
+To count the number of ordinal trees, we construct a mapping between ordinal trees and binary trees. The left child of every node will be the first child in the ordinal tree, but the the right child corresponds to the immediately right sibling.</p>
+<p><img src="Attachments/Pasted%20image%2020250401131510.png" alt="Pasted image 20250401131510.png" /></p>
+<h1 id="2-information-theoretic-lower-bound-of-representing-a-binary-tree"><a class="header" href="#2-information-theoretic-lower-bound-of-representing-a-binary-tree">2. Information-theoretic lower bound of representing a binary tree</a></h1>
+<ol>
+<li>Definition of information-theoretic lower bound</li>
+</ol>
+<p>Given a combinatorial object of $n$ elements where $u$ is the number of different such objects of size $n$, the information theoretic lower bound on the number of bits needed to represent such an object is $\log u$ bits (because we need to be able to distinguish the $u$ different objects).</p>
+<ol start="2">
+<li>Binary trees
+$$\begin{aligned} \log C_{n} &amp;= \log\left( \frac{(2n)!}{(n!)^2} \right) - \log(n+1) \ &amp;= \log(2n)! - 2 \log n! - \log(n+1) \ &amp;= 2n \log(2n) - 2n \log n + o(n) &amp; \text{(Sterling's approximation)} \ &amp; = 2n(\log(n+1)) - 2n \log n + o(n) \ &amp;= 2n + O(n) \end{aligned}$$
+Now, recall that
+$$\frac{\binom{2n}{n}}{(n+1)} \approx C \cdot \frac{2^{2n}}{n^{\frac{3}{2}}}$$
+This allows us to turn $2n + O(n)$ into
+$$2n - \frac{3}{2} \log n + O(1)$$
+$\rightarrow$ Trees can be represented in $2n$ bits!</li>
+</ol>
+<p>But, can we still manage to navigate them when they're represented that succinctly?</p>
+<h1 id="3-level-order-representation-of-binary-trees"><a class="header" href="#3-level-order-representation-of-binary-trees">3. Level-order representation of binary trees</a></h1>
+<p>Append an external node for each missing child. For each node in level order, write $0$ if external, $1$ if internal</p>
+<p><img src="Attachments/Pasted%20image%2020250401133944.png" alt="Pasted image 20250401133944.png" />
+<img src="Attachments/Pasted%20image%2020250401134238.png" alt="Pasted image 20250401134238.png" /></p>
+<p>This takes $2n+1$ bits.</p>
+<ol>
+<li>Navigation</li>
+</ol>
+<p><strong>Claim:</strong> The left and right children of the $i$th internal node are at positions $2i$ and $2i+1$ in the bit vector.</p>
+<p><strong>Proof:</strong></p>
+<p>Induction on $i$.</p>
+<p>This is clearly true for $i=1$ (root). For $i &gt; 1$, by the induction hypothesis, the children of the $(i-1)$st internal node are at positions $2(i-1) = 2i - 2$ and $(2(i-1)) + 1 = 2i-1$.</p>
+<p>Visually, this presents us with two cases:</p>
+<ol>
+<li>The $(i-1)$st and $i$th internal nodes are the same level
+<img src="Attachments/Pasted%20image%2020250401135350.png" alt="Pasted image 20250401135350.png" /></li>
+<li>The $(i-1)$st and $i$th internal nodes are not on the same level
+<img src="Attachments/Pasted%20image%2020250401135414.png" alt="Pasted image 20250401135414.png" /></li>
+</ol>
+<p>Level ordering is preserved in children, i.e. $A$'s children precede $B$'s children in level order $\iff$ $A$ precedes $B$ in level order. All nodes between the $(i-1)$st internal node and the $i$th internal node are external nodes with no children, so the children of the $i$th internal node immediately follow children of the $(i-1)$st. So, they must be at positions $2i$ and $2i+1$.</p>
+<p>Using the following definitions of rank and select
+$\text{rank}<em>{1}(i) =$ the number of $1$s up to and including position $i$
+$\text{select}</em>{1}(j) =$ the position of the $j$th $1$-bit</p>
+<p>We can identify each node by its position in the bit vector as
+$\text{left-child}(i) = 2 \cdot \text{rank}<em>{1}(i)$
+$\text{right-child}(i) = 2 \cdot \text{rank}</em>{1}(i) + 1$
+$\text{parent}(i) = 2 \cdot \text{select}_{1}\left( \left\lfloor \frac{i}{2} \right\rfloor \right)$</p>
+<p><strong>But how do we implement $\text{rank}$?</strong></p>
+<p>First, split the bit vector into $(\log^2n)$-bit superblocks</p>
+<p><img src="Attachments/Pasted%20image%2020250401141050.png" alt="Pasted image 20250401141050.png" />
+Then, split each superblock into $\frac{1}{2} \log n$-bit blocks
+<img src="Attachments/Pasted%20image%2020250401141514.png" alt="Pasted image 20250401141514.png" />
+Use a lookup table for bit vectors of length $\frac{1}{2} \log n$. For any possible bit vector of length $\frac{1}{2} \log n$, and for each of its positions, store the answer.
+<img src="Attachments/Pasted%20image%2020250401142018.png" alt="Pasted image 20250401142018.png" />
+<img src="Attachments/Pasted%20image%2020250401142358.png" alt="Pasted image 20250401142358.png" />
+Finally, define $\text{rank}$ as $$\begin{aligned} \text{rank of superblock} \ + \quad \text{relative rank of block within superblock} \ + \quad \text{relative rank of element within block} \end{aligned}$$
+Allowing us to computer it in $O(1)$ time. Note that we can follow a similar process for $\text{select}$.</p>
+<p>This allows us to conclude that we can represent a binary tree in $2n + o(n)$ bits, and access the $\text{left-child}, \ \text{right-child}, \ \text{parent}$ in $O(1)$ time.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="text-indexing-structures"><a class="header" href="#text-indexing-structures">Text Indexing Structures</a></h1>
+<h1 id="1-text-search"><a class="header" href="#1-text-search">1. Text Search</a></h1>
+<p>We are given an alphabet $\Sigma$ of size $\sigma$, a text string $T$ of length $n$ over $\Sigma$, and a pattern string $p$, we want to find <strong>the occurrences of $P$ in $T$</strong>.</p>
+<h1 id="2-string-matching-algorithms"><a class="header" href="#2-string-matching-algorithms">2. String matching algorithms</a></h1>
+<ol>
+<li>No preprocessing</li>
+<li>The <strong>obvious</strong> method: moving window</li>
+<li>$O(n + p)$-time solutions T
+<ul>
+<li><strong>Knuth-Morris-Pratt</strong></li>
+<li><strong>Boyer-Moore</strong></li>
+<li><strong>Rabin-Karp</strong></li>
+</ul>
+</li>
+</ol>
+<h1 id="3-text-indexing"><a class="header" href="#3-text-indexing">3. Text indexing</a></h1>
+<ol>
+<li>Preprocess a $T$-text index</li>
+<li>Each time a new pattern is given</li>
+</ol>
+<h1 id="4-warm-up-trie"><a class="header" href="#4-warm-up-trie">4. Warm-up: trie</a></h1>
+<ol>
+<li>Representing strings $T_{1}, T_{2}, \dots, T_{k}$</li>
+<li>A rooted tree with edges labelled with letters in $\Sigma$</li>
+<li>To represent strings as root-to-leaf paths in a trie, terminate them with a new letter $\$$ that is less than any symbol in $\Sigma$ &gt; [!example] &gt; Given ${ ana, ann, anna, anne }$, &gt; &gt; <img src="Attachments/Pasted%20image%2020250320135835.png" alt="Pasted image 20250320135835.png" /> 5. The in-order traversal of leaves is equivalent to a a sorting of the strings in lexicographical order 6. Check if $P$ is in ${ T_{1}, T_{2}, \dots , T_{k} }$ top-down traversal 7. If each node stores pointers to children in sorted order, then the number of nodes in the trie is $\leq \sum_{i=1}^k |T_{i}| + 1$ - Query time: $O(p \log \sigma)$ - Space: $O(n) +$ space form ${ T_{1}, T_{2}, \dots , T_{k} }$ 8. Compressed trie: contract non-branch paths to single edges &gt; [!example] &gt; <img src="Attachments/Pasted%20image%2020250320135803.png" alt="Pasted image 20250320135803.png" /> # 5. Suffix Tree 1. A compressed trie of all suffixes of $T \$$ &gt; [!example] &gt; <img src="Attachments/Pasted%20image%2020250320135519.png" alt="Pasted image 20250320135519.png" /> - $n+1$ leaves - Edge label = substring $T[i \dots j]$, store as two indices $(i, j)$ - Space: $O(n)$ 2. Text search - The search for $p$ gives a subtree whose leaves correspond to all occurrences of $p$ - If each node stores pointers to children in sorted order, the query time is $O(p \log \sigma)$ - If we use perfect hashing, the time becomes $O(p)$ - And, if we report all occurrences, the time is $O(p + occ)$ - [ ] #final what if the pattern does match any of the edges exactly (example: n instead of na) 3. Applications - Longest repeating substring in $T$ In $banana \$$, that would be $ana$.</li>
+</ol>
+<p>We construct a suffix tree, then look for the branching node of maximum letter depth. When constructing a suffix tree, treat $\sigma$ as a constant, allowing us to bound the construction to $O(n)$ time.</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+#final what does this mean? alphabet</li>
+</ul>
+<p>Computing the letter depth in preorder traversal takes $O(n)$ time, too.</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+#final because it uses DFS/BFS right?</li>
+</ul>
+<h1 id="6-suffix-array"><a class="header" href="#6-suffix-array">6. Suffix array</a></h1>
+<ol>
+<li>Sort the suffixes of $T \$$, then just store the indices of the suffixes &gt; [!example] &gt; Note that the entries of the second column <em>are</em> the suffix array &gt; &gt; <img src="Attachments/Pasted%20image%2020250325133433.png" alt="Pasted image 20250325133433.png" /> 1. Text search with suffix array We use binary search over the array. This takes $O(\log(n+1)\cdot p)$ to determine where pattern $P$ of length $p$ occurs in $T$. 3. A simple accelerant Let $L, R$ be the left and right boundaries of the current search interval. We use a modified binary search which uses the midpoint to update $L$ or $R$. We also track $l$, the length of the longest prefix of $T[SA[L] \dots n]$ that matches $P$, and $r$, the length of the longest prefix of $T[SA[R] \dots n]$ that matches $P$. &gt; [!example] &gt; For $aba$, &gt; &gt; | $(L,R)$ | $(0,6)$ | $(0,3)$ | $(1,3)$ | $(1,2)$ | &gt; | ------- | -------- | -------- | ------- | ------- | &gt; | $(l,r)$ | $(0, 0)$ | $(0, 1)$ | $(1,1)$ | $(1,1)$ | Define $h$ as $\min(l, r)$. Observe that the first $h$ characters of $P, \ T[S[A] \dots n], \ T[SA[l+1] \dots n], \  \dots, \  T[SA[R] \dots n] \ = \ P[0 \dots h-1]$ So, when comparing in binary search, we can start from $P[h]$. 4. A super accelerant &gt; [!example] &gt; $lcp(2,3) = 3$ We call an examination of a character in $P$ redundant if that character has been examined before. Our <strong>goal</strong> is to reduce redundant character examination to be $\leq 1$ per iteration of the binary search such that the running time is $O(p + \log n)$ where the $p$ term is due to each non-redundant character examination. To achieve this goal, we need to do more preprocessing first. For each triple $(L, M, R)$ that can arise during binary search, we precompute $lcp(L,M)$ and $lcp(M,R)$. Since there are $(n+1) - 2$ unique midway points. Since there are two arrays indexed by $M$, this uses $2n-2$ total extra space. Let $Pos(i)$ represent the suffix starting at position $T[SA[i] \dots n]$. In the simplest case, in any iteration of the binary search, if $l = r$, then we compare $P$ to the suffix of the midway point $Pos(M)$, starting from $P[h]$, as before. In the general case, when $l \neq r$, we assume w.l.o.g, that $l &gt; r$. We analyze the following three cases: 1. If $lcp(L,M) &gt; l$, then the longest common prefix of suffixes $Pos(L)$ and $Pos(M)$ is larger than the longest common prefix between $P$ and $Pos(L)$. <img src="Attachments/Pasted%20image%2020250327134311.png" alt="Pasted image 20250327134311.png" /> 2. If $lcp(L, M) &lt; l$, <img src="Attachments/Pasted%20image%2020250327134857.png" alt="Pasted image 20250327134857.png" /> 3. If $lcp(L, M) = l$, then $P$ agrees with $Pos(M)$ up to position $l-1$. Start comparisons from $P[l]$. - [ ] #final so, what happened to L and R here Compare middle, set middle to be left or right boundaries - [ ] #skipped I could probably figure this out if I tried longer ... <strong>Running time</strong> In the two cases where the algorithm examines a character during the iteration, the comparison starts with $P[\max(l, r)]$. Suppose $k$ characters of $P$ are examined in this iteration. Then there are $k-1$ matches, and $\max(l, r)$ increases by $k-1$. Hence, at the start of any following iteration, $P[\max(l, r)]$ may have already been examined but the next character in $P$ may not have been. Therefore, there are $\leq 1$ redundant character examinations per iteration. <img src="Attachments/Pasted%20image%2020250327140640.png" alt="Pasted image 20250327140640.png" /> # 7. Construction 1. Suffix trees/arrays for Strings over a constant-sized alphabet can be constructed in $O(n)$ time. 2. Suffix trees/arrays for strings over an alphabet $\Sigma = { 1, 2, 3, \dots , n }$ can also be constructed in $O(n)$ time.</li>
+</ol>
+<p><strong>Mentions</strong></p>
+<ul>
+<li>bzip2</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="van-emde-boas-trees"><a class="header" href="#van-emde-boas-trees">Van Emde Boas Trees</a></h1>
+<h1 id="1-problem-2"><a class="header" href="#1-problem-2">1. Problem</a></h1>
+<h4 id="1-maintain-an-ordered-set-of-elements-to-support"><a class="header" href="#1-maintain-an-ordered-set-of-elements-to-support">1. Maintain an ordered set of elements to support</a></h4>
+<ul>
+<li>Membership (search)</li>
+<li>Successor/predecessor</li>
+<li>Insert/delete</li>
+</ul>
+<h4 id="2-most-well-known-solutions-balanced-search-trees"><a class="header" href="#2-most-well-known-solutions-balanced-search-trees">2. Most well-known solutions: balanced search trees</a></h4>
+<p>$\Theta(\log n)$ time for $O(n)$ space</p>
+<h4 id="3-lower-bound-for-membership-search-under-the-binary-decision-tree"><a class="header" href="#3-lower-bound-for-membership-search-under-the-binary-decision-tree">3. Lower bound for membership (search) under the binary decision tree:</a></h4>
+<p>$\Omega(\log n)$</p>
+<h5 id="binary-decision-tree-model"><a class="header" href="#binary-decision-tree-model">Binary decision tree model</a></h5>
+<ul>
+<li>Any algorithm is modelled as a binary tree where each node is labelled $x &lt; y$</li>
+<li>Program execution corresponds to a root-leaf-path
+<img src="Attachments/Pasted%20image%2020250128133252.png" alt="Pasted image 20250128133252.png" /></li>
+<li>Decision trees correspond to algorithms that only use comparisons to gain knowledge about input</li>
+</ul>
+<p>Proof: Any binary decision tree for membership must have at least $n + 1$ leaves, one for each element + "not found". As a binary tree on $n+1$ leaves must have $\Omega(\log n)$, this lower bound applies.</p>
+<h4 id="4-counterexample-dynamic-perfect-hashing"><a class="header" href="#4-counterexample-dynamic-perfect-hashing">4. "Counterexample": dynamic perfect hashing</a></h4>
+<p>Perfect hashing: every element can be searched for in $O(1)$ time but it doesn't support insert/delete.</p>
+<p>Dynamic perfect hashing: can support insert/delete.</p>
+<p>Membership: $O(1)$ worst-case
+Insert/delete: $O(1)$ amortized <em>expected</em> time
+Space: $O(n)$</p>
+<h4 id="5-contradiction-not-really--different-machine-models"><a class="header" href="#5-contradiction-not-really--different-machine-models">5. Contradiction? Not really ... different machine models</a></h4>
+<p>RAM use input value as memory addresses, unlike binary decision tree model.</p>
+<h1 id="2-model-2"><a class="header" href="#2-model-2">2. Model</a></h1>
+<h4 id="1-word-ram"><a class="header" href="#1-word-ram">1. Word RAM</a></h4>
+<ul>
+<li>This model tries to model a realistic computer</li>
+<li>Word size $w \geq \log n$</li>
+<li>$O(1)$ "c-style" operations</li>
+</ul>
+<h4 id="2-universe-size-u"><a class="header" href="#2-universe-size-u">2. Universe size: $u$</a></h4>
+<ul>
+<li>Elements have values in the set ${ 0, 1, \dots, u-1 }$</li>
+<li>Elements fit in a machine word: $w \geq \log u$</li>
+</ul>
+<h1 id="3-preliminary-approaches"><a class="header" href="#3-preliminary-approaches">3. Preliminary Approaches</a></h1>
+<h4 id="1-direct-addressing"><a class="header" href="#1-direct-addressing">1. Direct Addressing</a></h4>
+<p>Bit vector: $u = 16$, $n=4$, $S = { 1, 9, 10, 15 }$
+<img src="Attachments/Pasted%20image%2020250128140631.png" alt="Pasted image 20250128140631.png" />
+$Insert / Delete / Membership: O(1)$
+$Successor / predecessor: O(u)$</p>
+<h4 id="2-carve-into-widgets-of-size-sqrt-u-"><a class="header" href="#2-carve-into-widgets-of-size-sqrt-u-">2. Carve into widgets of size $\sqrt{ u }$</a></h4>
+<p>$\rightarrow$ Assume that $u = 2^{2k}$</p>
+<p><img src="Attachments/Pasted%20image%2020250128141350.png" alt="Pasted image 20250128141350.png" />
+$W_{i}[j]$ denotes $i\sqrt{ u } + j$, $j=0, 1, \dots , \sqrt{ u } -1$
+$Summary[j] = 1 \iff$ $W_{i}$ contains at least a $1$</p>
+<ul>
+<li>$high(x) = \left\lfloor \frac{x}{\sqrt{ u }} \right\rfloor$</li>
+<li>$low(x) = x \mod{\sqrt{ u }}$</li>
+</ul>
+<p>Both are $O(1)$.</p>
+<ul>
+<li>$x = high(x) \cdot \sqrt{ u } + low(x)$</li>
+<li>When $x$ is represented as a $\log u$-bit binary number,
+$high(x) =$ most significant $\frac{\log u}{2}$ bits
+$low(x) =$ lowest ...</li>
+</ul>
+<p>Example
+$x = 9 \rightarrow 1001$
+$high(x) = 10$
+$low(x) = 01$
+$Membership(x) = W_{high(x)}[low(x)] = W_{2}[1]$
+Check if true!</p>
+<p>$\text{successor}(x)$
+Search to the right within $x$'s widget
+If we find a $1$, that position gives us the result
+Otherwise, search to the right within the summary
+If we find a $1$, that gives us the widget containing the Successor
+Scan that widget for the leftmost $1$</p>
+<p>$\text{Insert/Delete}:$ widget, summary
+$\text{Insert:}O(1)$ because we simply set that but to $1$ and set its summary bit to $1$ if unset
+$\text{Delete}: O(\sqrt{ u })$: because we might have to scan the widget to see if there are any other $1$s, and unset the summary bit as needed</p>
+<h1 id="4-a-recursive-structure"><a class="header" href="#4-a-recursive-structure">4. A recursive structure</a></h1>
+<h4 id="1-tu--tsqrt-u---o1"><a class="header" href="#1-tu--tsqrt-u---o1">1. $T(u) = T(\sqrt{ u }) + O(1)$</a></h4>
+<p>Let $m= \log u$, so that $u=2^m$</p>
+<p>So that the recurrence becomes $$T(2^m) = T(2^{\frac{m}{2}}) + O(1)$$
+Rename $S(m) = T(2^m)$ so that it becomes
+$$S(m) = S\left( \frac{m}{2} \right) + O(1)$$
+Using the Master theorem, we can solve this as
+$$S(m) = O(\log m)$$
+Change from $S(m)$ to $T(u)$
+$$T(u) = T(2^m) = S(m) = O(\log m) = O(\log \log u)$$</p>
+<h4 id="2-widget-w"><a class="header" href="#2-widget-w">2. Widget $W$</a></h4>
+<p><img src="Attachments/Pasted%20image%2020250130134332.png" alt="Pasted image 20250130134332.png" />
+<img src="Attachments/Pasted%20image%2020250130134345.png" alt="Pasted image 20250130134345.png" />
+<img src="Attachments/Pasted%20image%2020250130134400.png" alt="Pasted image 20250130134400.png" />
+Base case: $W$ has $2$ bits
+<img src="Attachments/Pasted%20image%2020250130134505.png" alt="Pasted image 20250130134505.png" /></p>
+<h4 id="3-textmemberwx"><a class="header" href="#3-textmemberwx">3. $\text{Member}(W,x)$</a></h4>
+<p>if $|W| = 2$
+return $W[x]$
+else
+return $\text{Member}(\text{sub}[W][\text{high}(x)], \text{low}(x))$</p>
+<p>Since we are only making $1$ recursive call, the recurrence for this is
+$$T(u) = T(\sqrt{ u }) + O(1)$$
+And so, the running time is $O(\log \log u)$</p>
+<h4 id="4-textinsertw-x"><a class="header" href="#4-textinsertw-x">4. $\text{Insert}(W, x)$</a></h4>
+<p>if $|W| = 2$
+$W[x] =1$
+else
+$\text{Insert}(\text{sub}[W][\text{high}(x)], \text{low}(x))$
+$\text{Insert}(\text{summary}[W], \text{high}(x))$</p>
+<p>Since we make $2$ recursive calls, the recurrence for this is
+$$T(u) = 2T(\sqrt{ u }) + \Theta(1)$$
+Let $m= \log u$, so that $u=2^m$ so that the recurrence becomes
+$$\begin{aligned} T(2^m) &amp;= 2T(2^{m/2}) + \Theta(1) \ S(m) &amp;= T(2^m) \ S(m) &amp;= 2S\left( m/2 \right) + \Theta(1) \ S(m) &amp;= \Theta(m) \ T(u) &amp;= T(2^m) = S(m) = \Theta(m) = \Theta(\log u) \end{aligned}$$</p>
+<h4 id="5-textsuccessorw-x"><a class="header" href="#5-textsuccessorw-x">5. $\text{Successor}(W, x)$</a></h4>
+<p>j $\leftarrow$ $\text{Successor}(\text{sub}[W][\text{high}(x)], \text{low}(x))$</p>
+<p>if $j &lt; \infty$
+return $\text{high}(x)\sqrt{ |W| } + j$
+else
+$i \leftarrow \text{Successor(Summary}[W], \text{high}(x))$
+$j \leftarrow \text{Successor(sub}[W][i], -\infty)$</p>
+<p>return $i \sqrt{ |W| } + j$</p>
+<p>We make $3$ recursive calls. The running time is $\Theta((\log u)^{\log 3})$.</p>
+<h1 id="5-van-emde-boas-trees"><a class="header" href="#5-van-emde-boas-trees">5. van Emde Boas Trees</a></h1>
+<h4 id="1-improvement-1-for-each-widget-w-store-minw-and-maxw"><a class="header" href="#1-improvement-1-for-each-widget-w-store-minw-and-maxw">1. Improvement 1: For each widget $W$, store $\min[W]$ and $\max[W]$</a></h4>
+<p>$\min[W] = \max[W] = -1$ if $W$ is empty
+<img src="Attachments/Pasted%20image%2020250130141250.png" alt="Pasted image 20250130141250.png" />
+$\text{Membership}: O(\log \log u)$</p>
+<p>$\text{Successor}(W,x)$:
+if $x &lt; \min[W]$
+return $\min[W]$
+else if $x \geq \max[W]$
+return $\infty$
+$W' \leftarrow \text{sub}[W][\text{high}(x)]$
+if $\text{low}(x) &lt; \max[W']$
+return $\text{high}(x)\sqrt{ |W| } + \text{Successor}(W', \text{low}(x))$
+else
+$i \leftarrow \text{Successor(Summary}[W], \text{high}(x))$
+return $i \sqrt{ |W| } + \min[\text{sub}[W][i]]$</p>
+<p>Which gives us $1$ recursive call in the worst case! $O(\log \log u)$</p>
+<p>$\text{Insert(W, x)}$:
+if $\text{sub[W]}[\text{high}(x)]$ is empty
+$\text{Insert}(\text{Summary}[W], \text{high}(x))$
+$\text{Insert(sub}[W][\text{high}(x)], \text{low}(x))$
+if $x &lt; \min[W]$ or $\min[W] = -1$:
+$\min[W] \leftarrow x$
+if $x &gt; \max[W]$
+$\max[W] \leftarrow x$</p>
+<h4 id="2-improvement-do-not-store-minw-maxw-in-any-subwidgets-of-w"><a class="header" href="#2-improvement-do-not-store-minw-maxw-in-any-subwidgets-of-w">2. Improvement: do not store $\min[W], \max[W]$ in any subwidgets of $W$</a></h4>
+<p>$\text{Membership}$: trivial change
+$\text{Successor}$: another trivial change</p>
+<p>$\text{Insert(W,x)}$:
+if $\min[W] = \max[W] = -1$:
+$\min[W] \leftarrow \max[W] \leftarrow x$
+else if $\min[W] = \max[W]$:
+$(\min[W], \max[W]) \leftarrow (\min(x, \min[W]), \quad \max(x, \max[W]))$
+else:
+if $x &lt; \min[W]$
+$\text{swap}(x, \min[W])$
+else if $x &gt; \max[W]$
+$\text{swap}(x, \max[W])$
+$W' \leftarrow \text{sub}[W][\text{high}(x)]$
+$\text{Insert}(W', \text{low}(x)) \quad (1)$
+if $\max[W'] = \min[W']$: (2)
+$\text{Insert}(\text{summary}[W], \text{high}(x))$</p>
+<p><strong>Analysis</strong>
+If $(2)$ is true, then $(1)$ takes $O(1)$ time.
+$$\begin{gathered} T(u) = T(\sqrt{ u }) + O(1) \ O(\log \log u) \end{gathered}$$
+$\text{Delete}(W, x)$:
+if $\min[W] = -1$:
+return
+if $\min[W] = \max[W]$:
+if $\min[W] = x$
+$\min[W] \leftarrow \max[W] \leftarrow -1$
+return
+if $\min[\text{summary}[W]] = -1$:
+if $\min[W] = x$:
+$\min[W] \leftarrow \max[W]$
+else if $\max[W] = x$:
+$\max[W] \leftarrow \min[W]$
+return
+if $\min[W] = x$:
+$j \leftarrow \min[\text{summary}[W]]$
+$\min[W] \leftarrow \min[\text{sub}[W][j]] + j\sqrt{ |W| }$
+$x \leftarrow \min[W]$
+if $\max[W] = x$:
+$j \leftarrow \max[\text{summary}[W]]$
+$\max[W] \leftarrow \max[\text{sub}[W][j]] + j\sqrt{ |W| }$
+$x \leftarrow \max[W]$
+$W' \leftarrow \text{sub}[W][\text{high}(x)]$
+$\text{Delete}(W', \text{low}(x)) \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad(1)$
+if $\min[W'] = -1: \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad (2)$
+$\text{Delete}(\text{summary}[W], \text{high}(x))$</p>
+<p><strong>Time Analysis</strong>
+If $(2)$ is true, $(1)$ uses $O(1)$ time. $O(\log \log u)$.</p>
+<p><strong>Space Analysis</strong>
+$$S(u) = (\sqrt{ u } + 1)S(\sqrt{ u }) + \Theta(\sqrt{ u }) = O(u)$$
+$\rightarrow\Theta(\sqrt{ u })$: pointers, min\max</p>
+<p>What if $\sqrt{ u }$ is not an integer?
+$\rightarrow$ Then, each subwidget has size $\lceil \sqrt{ u} \rceil$
+$$\begin{aligned} T(u) &amp;= T(\lceil \sqrt{ u } \rceil ) + O(1) \ &amp; \leq T(u^{2/3}) + O(1) \ &amp;= O(\log \log u) \end{aligned}$$</p>
+<h1 id="6-x-fast-trie"><a class="header" href="#6-x-fast-trie">6. X-fast Trie</a></h1>
+<h4 id="1-preliminary-approach"><a class="header" href="#1-preliminary-approach">1. Preliminary approach</a></h4>
+<p><img src="Attachments/Pasted%20image%2020250204142451.png" alt="Pasted image 20250204142451.png" /></p>
+<h4 id="2-x-fast-trie"><a class="header" href="#2-x-fast-trie">2. X-fast trie</a></h4>
+<ul>
+<li>Do not keep the bitvector</li>
+<li>Keep the doubly linked list</li>
+<li>Keep the $1$-nodes only
+<img src="Attachments/Pasted%20image%2020250206132115.png" alt="Pasted image 20250206132115.png" />
+<strong>Challenges:</strong></li>
+<li>$\text{successor}$: How to locate the lowest 1-node on the leaf-to-node path for a 0-leaf?
+<strong>Solution:</strong>
+a) Each ancestor of leaf $x$ corresponds to a prefix of $(x)_{2}$ (the binary representation of $x$)
+<img src="Attachments/Pasted%20image%2020250206132555.png" alt="Pasted image 20250206132555.png" />
+b) Using such a prefix as the key for any 1-node, we store it in a dynamic perfect hash table.
+c) The lowest 1-node that is an ancestor of $x$ corresponds to the longest prefix of $x$ in the hash table
+d) Binary search in prefixes of $x$ in $O(\log \log u)$ time
+- If this node has a 1-child as its right child, store a descendant pointer to the smallest leaf of its right subtree ($\text{successor(x)}$)
+- $\text{successor(x)}$: $O(\log \log u)$
+- $\text{member: } O(1)$
+- $\text{insert/delete : } O(\log u)$ amortized expected time
+- space: list $O(n)$, hash table $O(n \log u)$, tree $O(n \log u)$</li>
+</ul>
+<p><strong>Dynamic perfect hashing on $m$ keys</strong>
+$O(m)$ space
+$O(1)$ worst-case $\text{member}$
+$O(1)$ amortized expected $\text{insert/delete}$</p>
+<h4 id="3-y-fast-trie"><a class="header" href="#3-y-fast-trie">3. Y-fast trie</a></h4>
+<ul>
+<li>Indirection
+a) Cluster elements of $S$ into consecutive groups of size $\frac{1}{4} \log u \approx 2 \log u$
+b) Store elements of each group in a balanced BST
+c) Maintain a set of representative elements, one per group, stored in the X-fast trie structure
+<img src="Attachments/Pasted%20image%2020250206135810.png" alt="Pasted image 20250206135810.png" />
+A group's representative does not have to be in $S$ but it has to be strictly between the max element in the preceding groups and the min element in succeeding groups.
+<strong>Space:</strong>
+x-fast trie: $O((\text{number of elements}) \log u) = O\left( \frac{n}{\log u} \log u \right) = O(n)$
+BSTs: $O(n)$
+So, overall, $O(n)$
+<strong>Time:</strong>
+$\text{Member(x)}$
+If $x$ is in the x-fast trie, it is not necessarily in $S$.
+Search the corresponding binary balanced search tree for $x$. If we can find it, it must be in $S$. $O(\log \log u)$.
+Else,
+Find the predecessor and successor of $x$ in the x-fast trie. $O(\log \log u)$.
+We check those two BSTs to look for $x$. $O(\log \log u)$.
+$\text{Successor(x)}$: $O(\log \log u)$
+$\text{Insert/Delete(x)}$
+Use the x-fast trie to locate the group that $x$ is in.
+Insert (or delete) $x$ into the balanced BST for that group.
+When a group is of size $2 \log u$, split it. If it is $&lt; \frac{1}{4} \log u$, merge it with an adjacent group (this might cause another split).
+Split/merge: $O(\log u)$ amortized expected time
+This takes $\Omega(\log u)$ inserts/deletes
+Total: $O(\log \log u)$ amortized expected time</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
 
-                            <a rel="next prefetch" href="chapter_1_1.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -170,9 +1308,6 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
 
-                    <a rel="next prefetch" href="chapter_1_1.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
             </nav>
 
         </div>
@@ -210,6 +1345,14 @@
         <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
 
 
     </div>

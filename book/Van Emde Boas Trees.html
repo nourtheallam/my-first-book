@@ -1,0 +1,512 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Van Emde Boas Trees - course-notes</title>
+
+
+        <!-- Custom HTML head -->
+        <script>
+          // MathJax config must be defined before the MathJax script is loaded
+          window.MathJax = {
+            tex: {
+              inlineMath: [['$', '$'], ['\\(', '\\)']],
+              displayMath: [['$$', '$$'], ['\\[', '\\]']],
+              processEscapes: true
+            },
+            options: {
+              skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] // ignore code blocks
+            }
+          };
+        </script>
+        
+        <!-- Load MathJax v3 -->
+        <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">course-notes</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="van-emde-boas-trees"><a class="header" href="#van-emde-boas-trees">Van Emde Boas Trees</a></h1>
+<h1 id="1-problem"><a class="header" href="#1-problem">1. Problem</a></h1>
+<h4 id="1-maintain-an-ordered-set-of-elements-to-support"><a class="header" href="#1-maintain-an-ordered-set-of-elements-to-support">1. Maintain an ordered set of elements to support</a></h4>
+<ul>
+<li>Membership (search)</li>
+<li>Successor/predecessor</li>
+<li>Insert/delete</li>
+</ul>
+<h4 id="2-most-well-known-solutions-balanced-search-trees"><a class="header" href="#2-most-well-known-solutions-balanced-search-trees">2. Most well-known solutions: balanced search trees</a></h4>
+<p>$\Theta(\log n)$ time for $O(n)$ space</p>
+<h4 id="3-lower-bound-for-membership-search-under-the-binary-decision-tree"><a class="header" href="#3-lower-bound-for-membership-search-under-the-binary-decision-tree">3. Lower bound for membership (search) under the binary decision tree:</a></h4>
+<p>$\Omega(\log n)$</p>
+<h5 id="binary-decision-tree-model"><a class="header" href="#binary-decision-tree-model">Binary decision tree model</a></h5>
+<ul>
+<li>Any algorithm is modelled as a binary tree where each node is labelled $x &lt; y$</li>
+<li>Program execution corresponds to a root-leaf-path
+<img src="Attachments/Pasted%20image%2020250128133252.png" alt="Pasted image 20250128133252.png" /></li>
+<li>Decision trees correspond to algorithms that only use comparisons to gain knowledge about input</li>
+</ul>
+<p>Proof: Any binary decision tree for membership must have at least $n + 1$ leaves, one for each element + "not found". As a binary tree on $n+1$ leaves must have $\Omega(\log n)$, this lower bound applies.</p>
+<h4 id="4-counterexample-dynamic-perfect-hashing"><a class="header" href="#4-counterexample-dynamic-perfect-hashing">4. "Counterexample": dynamic perfect hashing</a></h4>
+<p>Perfect hashing: every element can be searched for in $O(1)$ time but it doesn't support insert/delete.</p>
+<p>Dynamic perfect hashing: can support insert/delete.</p>
+<p>Membership: $O(1)$ worst-case
+Insert/delete: $O(1)$ amortized <em>expected</em> time
+Space: $O(n)$</p>
+<h4 id="5-contradiction-not-really--different-machine-models"><a class="header" href="#5-contradiction-not-really--different-machine-models">5. Contradiction? Not really ... different machine models</a></h4>
+<p>RAM use input value as memory addresses, unlike binary decision tree model.</p>
+<h1 id="2-model"><a class="header" href="#2-model">2. Model</a></h1>
+<h4 id="1-word-ram"><a class="header" href="#1-word-ram">1. Word RAM</a></h4>
+<ul>
+<li>This model tries to model a realistic computer</li>
+<li>Word size $w \geq \log n$</li>
+<li>$O(1)$ "c-style" operations</li>
+</ul>
+<h4 id="2-universe-size-u"><a class="header" href="#2-universe-size-u">2. Universe size: $u$</a></h4>
+<ul>
+<li>Elements have values in the set ${ 0, 1, \dots, u-1 }$</li>
+<li>Elements fit in a machine word: $w \geq \log u$</li>
+</ul>
+<h1 id="3-preliminary-approaches"><a class="header" href="#3-preliminary-approaches">3. Preliminary Approaches</a></h1>
+<h4 id="1-direct-addressing"><a class="header" href="#1-direct-addressing">1. Direct Addressing</a></h4>
+<p>Bit vector: $u = 16$, $n=4$, $S = { 1, 9, 10, 15 }$
+<img src="Attachments/Pasted%20image%2020250128140631.png" alt="Pasted image 20250128140631.png" />
+$Insert / Delete / Membership: O(1)$
+$Successor / predecessor: O(u)$</p>
+<h4 id="2-carve-into-widgets-of-size-sqrt-u-"><a class="header" href="#2-carve-into-widgets-of-size-sqrt-u-">2. Carve into widgets of size $\sqrt{ u }$</a></h4>
+<p>$\rightarrow$ Assume that $u = 2^{2k}$</p>
+<p><img src="Attachments/Pasted%20image%2020250128141350.png" alt="Pasted image 20250128141350.png" />
+$W_{i}[j]$ denotes $i\sqrt{ u } + j$, $j=0, 1, \dots , \sqrt{ u } -1$
+$Summary[j] = 1 \iff$ $W_{i}$ contains at least a $1$</p>
+<ul>
+<li>$high(x) = \left\lfloor \frac{x}{\sqrt{ u }} \right\rfloor$</li>
+<li>$low(x) = x \mod{\sqrt{ u }}$</li>
+</ul>
+<p>Both are $O(1)$.</p>
+<ul>
+<li>$x = high(x) \cdot \sqrt{ u } + low(x)$</li>
+<li>When $x$ is represented as a $\log u$-bit binary number,
+$high(x) =$ most significant $\frac{\log u}{2}$ bits
+$low(x) =$ lowest ...</li>
+</ul>
+<p>Example
+$x = 9 \rightarrow 1001$
+$high(x) = 10$
+$low(x) = 01$
+$Membership(x) = W_{high(x)}[low(x)] = W_{2}[1]$
+Check if true!</p>
+<p>$\text{successor}(x)$
+Search to the right within $x$'s widget
+If we find a $1$, that position gives us the result
+Otherwise, search to the right within the summary
+If we find a $1$, that gives us the widget containing the Successor
+Scan that widget for the leftmost $1$</p>
+<p>$\text{Insert/Delete}:$ widget, summary
+$\text{Insert:}O(1)$ because we simply set that but to $1$ and set its summary bit to $1$ if unset
+$\text{Delete}: O(\sqrt{ u })$: because we might have to scan the widget to see if there are any other $1$s, and unset the summary bit as needed</p>
+<h1 id="4-a-recursive-structure"><a class="header" href="#4-a-recursive-structure">4. A recursive structure</a></h1>
+<h4 id="1-tu--tsqrt-u---o1"><a class="header" href="#1-tu--tsqrt-u---o1">1. $T(u) = T(\sqrt{ u }) + O(1)$</a></h4>
+<p>Let $m= \log u$, so that $u=2^m$</p>
+<p>So that the recurrence becomes $$T(2^m) = T(2^{\frac{m}{2}}) + O(1)$$
+Rename $S(m) = T(2^m)$ so that it becomes
+$$S(m) = S\left( \frac{m}{2} \right) + O(1)$$
+Using the Master theorem, we can solve this as
+$$S(m) = O(\log m)$$
+Change from $S(m)$ to $T(u)$
+$$T(u) = T(2^m) = S(m) = O(\log m) = O(\log \log u)$$</p>
+<h4 id="2-widget-w"><a class="header" href="#2-widget-w">2. Widget $W$</a></h4>
+<p><img src="Attachments/Pasted%20image%2020250130134332.png" alt="Pasted image 20250130134332.png" />
+<img src="Attachments/Pasted%20image%2020250130134345.png" alt="Pasted image 20250130134345.png" />
+<img src="Attachments/Pasted%20image%2020250130134400.png" alt="Pasted image 20250130134400.png" />
+Base case: $W$ has $2$ bits
+<img src="Attachments/Pasted%20image%2020250130134505.png" alt="Pasted image 20250130134505.png" /></p>
+<h4 id="3-textmemberwx"><a class="header" href="#3-textmemberwx">3. $\text{Member}(W,x)$</a></h4>
+<p>if $|W| = 2$
+return $W[x]$
+else
+return $\text{Member}(\text{sub}[W][\text{high}(x)], \text{low}(x))$</p>
+<p>Since we are only making $1$ recursive call, the recurrence for this is
+$$T(u) = T(\sqrt{ u }) + O(1)$$
+And so, the running time is $O(\log \log u)$</p>
+<h4 id="4-textinsertw-x"><a class="header" href="#4-textinsertw-x">4. $\text{Insert}(W, x)$</a></h4>
+<p>if $|W| = 2$
+$W[x] =1$
+else
+$\text{Insert}(\text{sub}[W][\text{high}(x)], \text{low}(x))$
+$\text{Insert}(\text{summary}[W], \text{high}(x))$</p>
+<p>Since we make $2$ recursive calls, the recurrence for this is
+$$T(u) = 2T(\sqrt{ u }) + \Theta(1)$$
+Let $m= \log u$, so that $u=2^m$ so that the recurrence becomes
+$$\begin{aligned} T(2^m) &amp;= 2T(2^{m/2}) + \Theta(1) \ S(m) &amp;= T(2^m) \ S(m) &amp;= 2S\left( m/2 \right) + \Theta(1) \ S(m) &amp;= \Theta(m) \ T(u) &amp;= T(2^m) = S(m) = \Theta(m) = \Theta(\log u) \end{aligned}$$</p>
+<h4 id="5-textsuccessorw-x"><a class="header" href="#5-textsuccessorw-x">5. $\text{Successor}(W, x)$</a></h4>
+<p>j $\leftarrow$ $\text{Successor}(\text{sub}[W][\text{high}(x)], \text{low}(x))$</p>
+<p>if $j &lt; \infty$
+return $\text{high}(x)\sqrt{ |W| } + j$
+else
+$i \leftarrow \text{Successor(Summary}[W], \text{high}(x))$
+$j \leftarrow \text{Successor(sub}[W][i], -\infty)$</p>
+<p>return $i \sqrt{ |W| } + j$</p>
+<p>We make $3$ recursive calls. The running time is $\Theta((\log u)^{\log 3})$.</p>
+<h1 id="5-van-emde-boas-trees"><a class="header" href="#5-van-emde-boas-trees">5. van Emde Boas Trees</a></h1>
+<h4 id="1-improvement-1-for-each-widget-w-store-minw-and-maxw"><a class="header" href="#1-improvement-1-for-each-widget-w-store-minw-and-maxw">1. Improvement 1: For each widget $W$, store $\min[W]$ and $\max[W]$</a></h4>
+<p>$\min[W] = \max[W] = -1$ if $W$ is empty
+<img src="Attachments/Pasted%20image%2020250130141250.png" alt="Pasted image 20250130141250.png" />
+$\text{Membership}: O(\log \log u)$</p>
+<p>$\text{Successor}(W,x)$:
+if $x &lt; \min[W]$
+return $\min[W]$
+else if $x \geq \max[W]$
+return $\infty$
+$W' \leftarrow \text{sub}[W][\text{high}(x)]$
+if $\text{low}(x) &lt; \max[W']$
+return $\text{high}(x)\sqrt{ |W| } + \text{Successor}(W', \text{low}(x))$
+else
+$i \leftarrow \text{Successor(Summary}[W], \text{high}(x))$
+return $i \sqrt{ |W| } + \min[\text{sub}[W][i]]$</p>
+<p>Which gives us $1$ recursive call in the worst case! $O(\log \log u)$</p>
+<p>$\text{Insert(W, x)}$:
+if $\text{sub[W]}[\text{high}(x)]$ is empty
+$\text{Insert}(\text{Summary}[W], \text{high}(x))$
+$\text{Insert(sub}[W][\text{high}(x)], \text{low}(x))$
+if $x &lt; \min[W]$ or $\min[W] = -1$:
+$\min[W] \leftarrow x$
+if $x &gt; \max[W]$
+$\max[W] \leftarrow x$</p>
+<h4 id="2-improvement-do-not-store-minw-maxw-in-any-subwidgets-of-w"><a class="header" href="#2-improvement-do-not-store-minw-maxw-in-any-subwidgets-of-w">2. Improvement: do not store $\min[W], \max[W]$ in any subwidgets of $W$</a></h4>
+<p>$\text{Membership}$: trivial change
+$\text{Successor}$: another trivial change</p>
+<p>$\text{Insert(W,x)}$:
+if $\min[W] = \max[W] = -1$:
+$\min[W] \leftarrow \max[W] \leftarrow x$
+else if $\min[W] = \max[W]$:
+$(\min[W], \max[W]) \leftarrow (\min(x, \min[W]), \quad \max(x, \max[W]))$
+else:
+if $x &lt; \min[W]$
+$\text{swap}(x, \min[W])$
+else if $x &gt; \max[W]$
+$\text{swap}(x, \max[W])$
+$W' \leftarrow \text{sub}[W][\text{high}(x)]$
+$\text{Insert}(W', \text{low}(x)) \quad (1)$
+if $\max[W'] = \min[W']$: (2)
+$\text{Insert}(\text{summary}[W], \text{high}(x))$</p>
+<p><strong>Analysis</strong>
+If $(2)$ is true, then $(1)$ takes $O(1)$ time.
+$$\begin{gathered} T(u) = T(\sqrt{ u }) + O(1) \ O(\log \log u) \end{gathered}$$
+$\text{Delete}(W, x)$:
+if $\min[W] = -1$:
+return
+if $\min[W] = \max[W]$:
+if $\min[W] = x$
+$\min[W] \leftarrow \max[W] \leftarrow -1$
+return
+if $\min[\text{summary}[W]] = -1$:
+if $\min[W] = x$:
+$\min[W] \leftarrow \max[W]$
+else if $\max[W] = x$:
+$\max[W] \leftarrow \min[W]$
+return
+if $\min[W] = x$:
+$j \leftarrow \min[\text{summary}[W]]$
+$\min[W] \leftarrow \min[\text{sub}[W][j]] + j\sqrt{ |W| }$
+$x \leftarrow \min[W]$
+if $\max[W] = x$:
+$j \leftarrow \max[\text{summary}[W]]$
+$\max[W] \leftarrow \max[\text{sub}[W][j]] + j\sqrt{ |W| }$
+$x \leftarrow \max[W]$
+$W' \leftarrow \text{sub}[W][\text{high}(x)]$
+$\text{Delete}(W', \text{low}(x)) \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad(1)$
+if $\min[W'] = -1: \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad (2)$
+$\text{Delete}(\text{summary}[W], \text{high}(x))$</p>
+<p><strong>Time Analysis</strong>
+If $(2)$ is true, $(1)$ uses $O(1)$ time. $O(\log \log u)$.</p>
+<p><strong>Space Analysis</strong>
+$$S(u) = (\sqrt{ u } + 1)S(\sqrt{ u }) + \Theta(\sqrt{ u }) = O(u)$$
+$\rightarrow\Theta(\sqrt{ u })$: pointers, min\max</p>
+<p>What if $\sqrt{ u }$ is not an integer?
+$\rightarrow$ Then, each subwidget has size $\lceil \sqrt{ u} \rceil$
+$$\begin{aligned} T(u) &amp;= T(\lceil \sqrt{ u } \rceil ) + O(1) \ &amp; \leq T(u^{2/3}) + O(1) \ &amp;= O(\log \log u) \end{aligned}$$</p>
+<h1 id="6-x-fast-trie"><a class="header" href="#6-x-fast-trie">6. X-fast Trie</a></h1>
+<h4 id="1-preliminary-approach"><a class="header" href="#1-preliminary-approach">1. Preliminary approach</a></h4>
+<p><img src="Attachments/Pasted%20image%2020250204142451.png" alt="Pasted image 20250204142451.png" /></p>
+<h4 id="2-x-fast-trie"><a class="header" href="#2-x-fast-trie">2. X-fast trie</a></h4>
+<ul>
+<li>Do not keep the bitvector</li>
+<li>Keep the doubly linked list</li>
+<li>Keep the $1$-nodes only
+<img src="Attachments/Pasted%20image%2020250206132115.png" alt="Pasted image 20250206132115.png" />
+<strong>Challenges:</strong></li>
+<li>$\text{successor}$: How to locate the lowest 1-node on the leaf-to-node path for a 0-leaf?
+<strong>Solution:</strong>
+a) Each ancestor of leaf $x$ corresponds to a prefix of $(x)_{2}$ (the binary representation of $x$)
+<img src="Attachments/Pasted%20image%2020250206132555.png" alt="Pasted image 20250206132555.png" />
+b) Using such a prefix as the key for any 1-node, we store it in a dynamic perfect hash table.
+c) The lowest 1-node that is an ancestor of $x$ corresponds to the longest prefix of $x$ in the hash table
+d) Binary search in prefixes of $x$ in $O(\log \log u)$ time
+- If this node has a 1-child as its right child, store a descendant pointer to the smallest leaf of its right subtree ($\text{successor(x)}$)
+- $\text{successor(x)}$: $O(\log \log u)$
+- $\text{member: } O(1)$
+- $\text{insert/delete : } O(\log u)$ amortized expected time
+- space: list $O(n)$, hash table $O(n \log u)$, tree $O(n \log u)$</li>
+</ul>
+<p><strong>Dynamic perfect hashing on $m$ keys</strong>
+$O(m)$ space
+$O(1)$ worst-case $\text{member}$
+$O(1)$ amortized expected $\text{insert/delete}$</p>
+<h4 id="3-y-fast-trie"><a class="header" href="#3-y-fast-trie">3. Y-fast trie</a></h4>
+<ul>
+<li>Indirection
+a) Cluster elements of $S$ into consecutive groups of size $\frac{1}{4} \log u \approx 2 \log u$
+b) Store elements of each group in a balanced BST
+c) Maintain a set of representative elements, one per group, stored in the X-fast trie structure
+<img src="Attachments/Pasted%20image%2020250206135810.png" alt="Pasted image 20250206135810.png" />
+A group's representative does not have to be in $S$ but it has to be strictly between the max element in the preceding groups and the min element in succeeding groups.
+<strong>Space:</strong>
+x-fast trie: $O((\text{number of elements}) \log u) = O\left( \frac{n}{\log u} \log u \right) = O(n)$
+BSTs: $O(n)$
+So, overall, $O(n)$
+<strong>Time:</strong>
+$\text{Member(x)}$
+If $x$ is in the x-fast trie, it is not necessarily in $S$.
+Search the corresponding binary balanced search tree for $x$. If we can find it, it must be in $S$. $O(\log \log u)$.
+Else,
+Find the predecessor and successor of $x$ in the x-fast trie. $O(\log \log u)$.
+We check those two BSTs to look for $x$. $O(\log \log u)$.
+$\text{Successor(x)}$: $O(\log \log u)$
+$\text{Insert/Delete(x)}$
+Use the x-fast trie to locate the group that $x$ is in.
+Insert (or delete) $x$ into the balanced BST for that group.
+When a group is of size $2 \log u$, split it. If it is $&lt; \frac{1}{4} \log u$, merge it with an adjacent group (this might cause another split).
+Split/merge: $O(\log u)$ amortized expected time
+This takes $\Omega(\log u)$ inserts/deletes
+Total: $O(\log \log u)$ amortized expected time</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="Text Indexing Structures.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="Text Indexing Structures.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

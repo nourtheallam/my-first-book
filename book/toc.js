@@ -8,9 +8,9 @@ class MDBookSidebarScrollbox extends HTMLElement {
         super();
     }
     connectedCallback() {
-        this.innerHTML = '<ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Chapter 1</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter_1_1.html"><strong aria-hidden="true">1.1.</strong> Chapter 1.1</a></li></ol></li></ol>';
+        this.innerHTML = '<ol class="chapter"><li class="chapter-item expanded "><a href="Amortized Analysis.html"><strong aria-hidden="true">1.</strong> Amortized Analysis</a></li><li class="chapter-item expanded "><a href="Entropy.html"><strong aria-hidden="true">2.</strong> Entropy</a></li><li class="chapter-item expanded "><a href="Resizable Arrays.html"><strong aria-hidden="true">3.</strong> Resizable Arrays</a></li><li class="chapter-item expanded "><a href="Self-Adjusting Binary Trees.html"><strong aria-hidden="true">4.</strong> Self-Adjusting Binary Trees</a></li><li class="chapter-item expanded "><a href="Self-Adjusting Lists.html"><strong aria-hidden="true">5.</strong> Self-Adjusting Lists</a></li><li class="chapter-item expanded "><a href="Succinct Data Structures.html"><strong aria-hidden="true">6.</strong> Succinct Data Structures</a></li><li class="chapter-item expanded "><a href="Text Indexing Structures.html"><strong aria-hidden="true">7.</strong> Text Indexing Structures</a></li><li class="chapter-item expanded "><a href="Van Emde Boas Trees.html"><strong aria-hidden="true">8.</strong> Van Emde Boas Trees</a></li></ol>';
         // Set the current, active page, and reveal it if it's hidden
-        let current_page = document.location.href.toString();
+        let current_page = document.location.href.toString().split("#")[0].split("?")[0];
         if (current_page.endsWith("/")) {
             current_page += "index.html";
         }

@@ -1,4 +1,10 @@
 # Summary
 
-- [Chapter 1](./chapter_1.md)
-	- [Chapter 1.1](./chapter_1_1.md)
+- [Amortized Analysis](Amortized%20Analysis.md)
+- [Entropy](Entropy.md)
+- [Resizable Arrays](Resizable%20Arrays.md)
+- [Self-Adjusting Binary Trees](Self-Adjusting%20Binary%20Trees.md)
+- [Self-Adjusting Lists](Self-Adjusting%20Lists.md)
+- [Succinct Data Structures](Succinct%20Data%20Structures.md)
+- [Text Indexing Structures](Text%20Indexing%20Structures.md)
+- [Van Emde Boas Trees](Van%20Emde%20Boas%20Trees.md)

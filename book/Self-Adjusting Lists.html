@@ -1,0 +1,379 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Self-Adjusting Lists - course-notes</title>
+
+
+        <!-- Custom HTML head -->
+        <script>
+          // MathJax config must be defined before the MathJax script is loaded
+          window.MathJax = {
+            tex: {
+              inlineMath: [['$', '$'], ['\\(', '\\)']],
+              displayMath: [['$$', '$$'], ['\\[', '\\]']],
+              processEscapes: true
+            },
+            options: {
+              skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] // ignore code blocks
+            }
+          };
+        </script>
+        
+        <!-- Load MathJax v3 -->
+        <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">course-notes</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="self-adjusting-lists"><a class="header" href="#self-adjusting-lists">Self-Adjusting Lists</a></h1>
+<h3 id="1-problem-linear-search"><a class="header" href="#1-problem-linear-search">1. Problem: linear search</a></h3>
+<p>Given $n$ elements, and a key for an element, search for it by linearly iterating through the list.</p>
+<p>Worst case: $n$ comparisons</p>
+<p>Average case: If all elements have equal probability of search, then the expected time is $\frac{n+1}{2}$ in successful case and $n$ for an unsuccessful.</p>
+<ul>
+<li>How did we get $\frac{n+1}{2}$?
+$$\begin{aligned} \frac{1}{n}\cdot 1 + \frac{1}{n} \cdot 2 + \frac{1}{n} \cdot 3 + \dots + \frac{1}{n} \cdot n \= \frac{1}{n}(1+2+ \dots + n) \= \frac{n+1}{2} \end{aligned}$$</li>
+</ul>
+<h3 id="2-real-questions"><a class="header" href="#2-real-questions">2. Real Questions</a></h3>
+<h4 id="1-what-if-the-probabilities-of-access-differ"><a class="header" href="#1-what-if-the-probabilities-of-access-differ">1. What if the probabilities of access differ?</a></h4>
+<p>Let $p_{i}$ be the probability of requesting element $i$.</p>
+<h4 id="2-what-if-these-independent-probabilities-are-not-given"><a class="header" href="#2-what-if-these-independent-probabilities-are-not-given">2. What if these (independent) probabilities are not given?</a></h4>
+<h4 id="3-how-do-solutions-compare-with-the-best-we-could-do"><a class="header" href="#3-how-do-solutions-compare-with-the-best-we-could-do">3. How do solutions compare with the best we could do</a></h4>
+<h3 id="3-self-adjusting-data-structures---adapt-to-changing-probabilities"><a class="header" href="#3-self-adjusting-data-structures---adapt-to-changing-probabilities">3. Self-adjusting data structures - Adapt to changing probabilities</a></h3>
+<h4 id="1-if-probabilities-are-the-same-and-independent-it-doesnt-matter-how-you-change-the-structure"><a class="header" href="#1-if-probabilities-are-the-same-and-independent-it-doesnt-matter-how-you-change-the-structure">1. If probabilities are the same and independent, it doesn't matter how you change the structure</a></h4>
+<h4 id="2-if-both-probabilities-and-list-are-fixed-minimize-sum_i1n-i-p_i"><a class="header" href="#2-if-both-probabilities-and-list-are-fixed-minimize-sum_i1n-i-p_i">2. If both probabilities and list are fixed, minimize $\sum_{i=1}^n i p_{i}$</a></h4>
+<p>Greedy: element with the highest probability should be placed first.</p>
+<p>Let $S_{opt}$ be the starting optimal solution.</p>
+<h4 id="3-how-can-we-adapt-to-changes-in-probability-or-self-adjust"><a class="header" href="#3-how-can-we-adapt-to-changes-in-probability-or-self-adjust">3. How can we adapt to changes in probability or self-adjust?</a></h4>
+<p>Move elements forward as accessed.</p>
+<p>Heuristics:</p>
+<ul>
+<li>Move-to-front (MTF): after an item is accessed, move it to the front of the list.</li>
+<li>Transpose (TR): After an item is accessed, exchange it with the immediate preceding item.</li>
+<li>Frequency count (FC): Maintain a frequency count for each item, initially $0$. Increase the count of an item by $1$ whenever it is accessed. Maintain a list such that the items are in decreasing order by frequency count.</li>
+</ul>
+<h3 id="4-static-optimality"><a class="header" href="#4-static-optimality">4. Static optimality</a></h3>
+<h4 id="1-compare-mtf-to-s_opt"><a class="header" href="#1-compare-mtf-to-s_opt">1. Compare MTF to $S_{opt}$</a></h4>
+<h3 id="2-model"><a class="header" href="#2-model">2. Model</a></h3>
+<p>Start with an empty list.
+Scan for elements requested. If not present
+Insert (and change) as if found at the end of the list (then apply heuristic)</p>
+<p>Cost: number of comparisons</p>
+<h4 id="3-the-cost-of-mtf-leq-2cdot-s_opt-for-any-sequence-of-requests"><a class="header" href="#3-the-cost-of-mtf-leq-2cdot-s_opt-for-any-sequence-of-requests">3. The cost of MTF $\leq 2\cdot S_{opt}$ for any sequence of requests</a></h4>
+<p><strong>Proof</strong></p>
+<p>Consider an arbitrary list, but focus on searches for $b$, $c$ (two arbitrary elements), and "unsuccessful comparisons" where we compare query value $b$ against $c$ or $c$ against $b$.</p>
+<p>Assume the request sequence has $k$ $b$'s and $m$ $c$'s (no assumption on order of searches). Without loss of generality, assume that $k \leq m$.</p>
+<p>$S_{opt}$ order is $c b$ and there are $k$ unsuccessful comparisons.</p>
+<p>What order of requests maximizes this number under MTF?</p>
+<p>Clearly, $C^{m-k}(bc)^k$.</p>
+<p>There are $2k$ unsuccessful comparisons.</p>
+<p>Under MTF, an unsuccessful comparison will happen whenever the request sequence changes, from $b$ to $c$ or $c$ to $b$.</p>
+<p>Since each change involves a $b$ and each $b$ can be involved in at most two changes, the total number of such changes is $\leq 2k$.</p>
+<p>This holds for any pair of elements, sum over all the total number of unsuccessful comparisons of MTF
+$$\leq 2 \cdot \dots \cdot S_{opt}$$</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+🔼 What is this?</li>
+</ul>
+<p>We also observe that the total number of successful comparisons of MTF and the total number of successful comparisons of $S_{opt}$ are equal.</p>
+<p>And the number of cost of MTF is at most $2 \cdot S_{opt}$.</p>
+<h4 id="4-this-bound-is-tight"><a class="header" href="#4-this-bound-is-tight">4. This bound is tight.</a></h4>
+<p>Given $a_{1}, a_{2}, a_{3}, \dots , a_{n}$, we repeatedly ask for the last element in the list. So, the elements are requested equally often.</p>
+<p>The cost of MTF is $n$ comparisons per search. But for the $S_{opt}$, every item has the same probability of being accessed, so the cost is $\frac{n+1}{2}$.</p>
+<h4 id="5-for-some-sequences-mtf-does-much-better"><a class="header" href="#5-for-some-sequences-mtf-does-much-better">5. For some sequences, MTF does much better</a></h4>
+<p>Consider the following sequence of requests
+$$a_{1}^n \ a_{2}^n \dots a_{n}^n$$
+The cost of $S_{opt}$ would be $\frac{n+1}{2}$</p>
+<p>The cost of MTF would be
+$$\begin{aligned} \frac{(1+(n-1)) + (2+(n-1)) + (3+(n-1)) + \dots + (n + (n-1))}{n^2}\ = \frac{\frac{n(n+1)}{2} + n(n-1)}{n^2} \ = \frac{3}{2} - \Theta\left( \frac{1}{n} \right) \end{aligned}$$</p>
+<h3 id="5-dynamic-optimality"><a class="header" href="#5-dynamic-optimality">5. Dynamic optimality</a></h3>
+<h4 id="1-online-vs-offline"><a class="header" href="#1-online-vs-offline">1. Online vs Offline</a></h4>
+<ul>
+<li>Online: Must respond as requests come</li>
+<li>Offline: Get to see the entire schedule and determine how to move values</li>
+</ul>
+<h4 id="2-competitive-ratio-of-alg"><a class="header" href="#2-competitive-ratio-of-alg">2. Competitive ratio of $Alg$</a></h4>
+<p>$=$ worst case of $\frac{\text{Online time of }Alg}{\text{Optimal offline time}}$</p>
+<h4 id="3-a-method-is-competitive-if-this-ratio-is-a-constant"><a class="header" href="#3-a-method-is-competitive-if-this-ratio-is-a-constant">3. A method is "competitive" if this ratio is a constant</a></h4>
+<h4 id="4-model"><a class="header" href="#4-model">4. Model</a></h4>
+<ul>
+<li>Search for or change element in position $i$: scan to location $i$ at cost $i$</li>
+<li>Free exchange: exchanges (swaps) between adjacent elements that are required to move element $i$ closer to the front are free of cost</li>
+<li>Paid exchange: any other exchange (swapping) between adjacent elements costs $1$</li>
+</ul>
+<p><strong>Before cost of self-adjusting</strong></p>
+<ul>
+<li>$Access$: costs $i$ if element is in position $i$</li>
+<li>$Delete$: costs $i$ if element is in position $i$</li>
+<li>$Insert$: costs $n+1$ if $n$ elements are already there</li>
+</ul>
+<h4 id="5-definitions"><a class="header" href="#5-definitions">5. Definitions</a></h4>
+<ul>
+<li>Request sequence: $M$ queries, $n$ max data values</li>
+<li>Start with empty list</li>
+<li>Cost model for a search that ends with finding the element at position $i$ is $i +$ number of paid exchanges</li>
+<li>$C_{A}(S)$: the total cost of all operations for an algorithm $A$, not counting paid exchanges</li>
+<li>$X_{A}(S)$: number of paid exchanges
+$$X_{MTF}(S) = X_{TR}(S) = X_{FC}(S) = 0$$</li>
+<li>$F_{A}(S)$: number of free exchanges</li>
+</ul>
+<p><strong>Observation:</strong> $F_{A}(S) \leq C_{A}(S) - M$
+After accessing the $i$th element,  there are $\leq i - 1$ free exchanges.</p>
+<p><strong>Claim:</strong> $C_{MTF} \leq 2 C_{A}(S) + X_{A}(S) - F_{A}(S) - M$ for any algorithm $A$ starting with an empty set</p>
+<p><strong>Proof:</strong></p>
+<p>We run $A$ and $MTF$ in parallel, on the same request sequence $S$. The potential function $\phi$ is defined as the number of inversions* between $MTF$'s list and $A$'s list. Now, we bound the time of $access$.</p>
+<p>Consider access by $A$ to position $i$ and assume we go to position $k$ is $MTF$'s list. Let $x_{i}$ be the number of items preceding the element in $MTF$'s list but not $A$'s list. So, the number of items preceding it in both lists is $k-1 - x_{i}$.</p>
+<p>Moving the element to front in $MTF$'s list creates $k - 1 - x_{i}$ (between the element and those that used to precede it), and destroys $x_{i}$ inversions.</p>
+<p>Amortized analysis:
+$$k + (k-1-x_{i}) - x_{i} = 2(k-x_{i}) - 1$$
+Since $k-1-x_{i} \leq i-1$, we can conclude that $k-x_{i} \leq i$.</p>
+<p>This gives us an amortized time of $\leq 2i - 1 = 2C_{A} - 1$ where $C_{A}$ is the cost of access for $A$ without exchanges (similar to insert/delete). An exchange by $A$ has $0$ cost to $MTF$, so the amortized time of an exchange by $A$ is increased in the number of inversions caused by exchange: $1$ for paid, $-1$ for free.</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+#skipped for now ...
+So, the total amortized cost is
+$$2C_{A}(S) - M + X_{A}(S) - F_{A}(S)$$</li>
+</ul>
+<p><strong>Conclusion</strong></p>
+<p>MTF is $2$-competitive</p>
+<p>$$\begin{aligned} T_{A}(S) &amp;= C_{A}(S) + X_{A}(S) \ T_{MTF}(S) &amp;= C_{MTF}(S) \ &amp;\leq 2C_{A}(S) + X_{A}(S) - F_{A}(S) - M \ &amp;\leq 2T_{A}(S) \end{aligned}$$
+* An inversion is defined as any pair of elements that appear in different orders relative to each other in different lists.</p>
+<p><img src="Attachments/Pasted%20image%2020250302145329.png" alt="Pasted image 20250302145329.png" /></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="Self-Adjusting Binary Trees.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="Succinct Data Structures.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="Self-Adjusting Binary Trees.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="Succinct Data Structures.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

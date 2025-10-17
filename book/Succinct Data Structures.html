@@ -1,0 +1,328 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Succinct Data Structures - course-notes</title>
+
+
+        <!-- Custom HTML head -->
+        <script>
+          // MathJax config must be defined before the MathJax script is loaded
+          window.MathJax = {
+            tex: {
+              inlineMath: [['$', '$'], ['\\(', '\\)']],
+              displayMath: [['$$', '$$'], ['\\[', '\\]']],
+              processEscapes: true
+            },
+            options: {
+              skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] // ignore code blocks
+            }
+          };
+        </script>
+        
+        <!-- Load MathJax v3 -->
+        <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">course-notes</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="succinct-data-structures"><a class="header" href="#succinct-data-structures">Succinct Data Structures</a></h1>
+<h1 id="1-number-of-trees-on-n-nodes"><a class="header" href="#1-number-of-trees-on-n-nodes">1. Number of trees on $n$ nodes</a></h1>
+<ol>
+<li>Binary trees</li>
+</ol>
+<p>Catalan number $$C_{n} \equiv \frac{\binom{2n}{n}}{n+1}$$
+2. Ordinal trees</p>
+<p>Defined as $$\text{child }1, \text{ child } 2, \text{ child } 3, \ \dots$$
+To count the number of ordinal trees, we construct a mapping between ordinal trees and binary trees. The left child of every node will be the first child in the ordinal tree, but the the right child corresponds to the immediately right sibling.</p>
+<p><img src="Attachments/Pasted%20image%2020250401131510.png" alt="Pasted image 20250401131510.png" /></p>
+<h1 id="2-information-theoretic-lower-bound-of-representing-a-binary-tree"><a class="header" href="#2-information-theoretic-lower-bound-of-representing-a-binary-tree">2. Information-theoretic lower bound of representing a binary tree</a></h1>
+<ol>
+<li>Definition of information-theoretic lower bound</li>
+</ol>
+<p>Given a combinatorial object of $n$ elements where $u$ is the number of different such objects of size $n$, the information theoretic lower bound on the number of bits needed to represent such an object is $\log u$ bits (because we need to be able to distinguish the $u$ different objects).</p>
+<ol start="2">
+<li>Binary trees
+$$\begin{aligned} \log C_{n} &amp;= \log\left( \frac{(2n)!}{(n!)^2} \right) - \log(n+1) \ &amp;= \log(2n)! - 2 \log n! - \log(n+1) \ &amp;= 2n \log(2n) - 2n \log n + o(n) &amp; \text{(Sterling's approximation)} \ &amp; = 2n(\log(n+1)) - 2n \log n + o(n) \ &amp;= 2n + O(n) \end{aligned}$$
+Now, recall that
+$$\frac{\binom{2n}{n}}{(n+1)} \approx C \cdot \frac{2^{2n}}{n^{\frac{3}{2}}}$$
+This allows us to turn $2n + O(n)$ into
+$$2n - \frac{3}{2} \log n + O(1)$$
+$\rightarrow$ Trees can be represented in $2n$ bits!</li>
+</ol>
+<p>But, can we still manage to navigate them when they're represented that succinctly?</p>
+<h1 id="3-level-order-representation-of-binary-trees"><a class="header" href="#3-level-order-representation-of-binary-trees">3. Level-order representation of binary trees</a></h1>
+<p>Append an external node for each missing child. For each node in level order, write $0$ if external, $1$ if internal</p>
+<p><img src="Attachments/Pasted%20image%2020250401133944.png" alt="Pasted image 20250401133944.png" />
+<img src="Attachments/Pasted%20image%2020250401134238.png" alt="Pasted image 20250401134238.png" /></p>
+<p>This takes $2n+1$ bits.</p>
+<ol>
+<li>Navigation</li>
+</ol>
+<p><strong>Claim:</strong> The left and right children of the $i$th internal node are at positions $2i$ and $2i+1$ in the bit vector.</p>
+<p><strong>Proof:</strong></p>
+<p>Induction on $i$.</p>
+<p>This is clearly true for $i=1$ (root). For $i &gt; 1$, by the induction hypothesis, the children of the $(i-1)$st internal node are at positions $2(i-1) = 2i - 2$ and $(2(i-1)) + 1 = 2i-1$.</p>
+<p>Visually, this presents us with two cases:</p>
+<ol>
+<li>The $(i-1)$st and $i$th internal nodes are the same level
+<img src="Attachments/Pasted%20image%2020250401135350.png" alt="Pasted image 20250401135350.png" /></li>
+<li>The $(i-1)$st and $i$th internal nodes are not on the same level
+<img src="Attachments/Pasted%20image%2020250401135414.png" alt="Pasted image 20250401135414.png" /></li>
+</ol>
+<p>Level ordering is preserved in children, i.e. $A$'s children precede $B$'s children in level order $\iff$ $A$ precedes $B$ in level order. All nodes between the $(i-1)$st internal node and the $i$th internal node are external nodes with no children, so the children of the $i$th internal node immediately follow children of the $(i-1)$st. So, they must be at positions $2i$ and $2i+1$.</p>
+<p>Using the following definitions of rank and select
+$\text{rank}<em>{1}(i) =$ the number of $1$s up to and including position $i$
+$\text{select}</em>{1}(j) =$ the position of the $j$th $1$-bit</p>
+<p>We can identify each node by its position in the bit vector as
+$\text{left-child}(i) = 2 \cdot \text{rank}<em>{1}(i)$
+$\text{right-child}(i) = 2 \cdot \text{rank}</em>{1}(i) + 1$
+$\text{parent}(i) = 2 \cdot \text{select}_{1}\left( \left\lfloor \frac{i}{2} \right\rfloor \right)$</p>
+<p><strong>But how do we implement $\text{rank}$?</strong></p>
+<p>First, split the bit vector into $(\log^2n)$-bit superblocks</p>
+<p><img src="Attachments/Pasted%20image%2020250401141050.png" alt="Pasted image 20250401141050.png" />
+Then, split each superblock into $\frac{1}{2} \log n$-bit blocks
+<img src="Attachments/Pasted%20image%2020250401141514.png" alt="Pasted image 20250401141514.png" />
+Use a lookup table for bit vectors of length $\frac{1}{2} \log n$. For any possible bit vector of length $\frac{1}{2} \log n$, and for each of its positions, store the answer.
+<img src="Attachments/Pasted%20image%2020250401142018.png" alt="Pasted image 20250401142018.png" />
+<img src="Attachments/Pasted%20image%2020250401142358.png" alt="Pasted image 20250401142358.png" />
+Finally, define $\text{rank}$ as $$\begin{aligned} \text{rank of superblock} \ + \quad \text{relative rank of block within superblock} \ + \quad \text{relative rank of element within block} \end{aligned}$$
+Allowing us to computer it in $O(1)$ time. Note that we can follow a similar process for $\text{select}$.</p>
+<p>This allows us to conclude that we can represent a binary tree in $2n + o(n)$ bits, and access the $\text{left-child}, \ \text{right-child}, \ \text{parent}$ in $O(1)$ time.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="Self-Adjusting Lists.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="Text Indexing Structures.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="Self-Adjusting Lists.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="Text Indexing Structures.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>
